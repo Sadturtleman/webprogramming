@@ -1,5 +1,5 @@
-import { Paddle } from "./paddle.js"
-import { Ball } from "./ball.js"
+import Paddle from "./paddle.js"
+import Ball from "./ball.js"
 
 const canvas = document.getElementById("gameCanvas")
 const ctx = canvas.getContext("2d")

@@ -1,4 +1,6 @@
-export class Paddle {
+import Direction from "./direction.js"
+
+class Paddle {
     static DEFAULT_WIDTH = 75
     static DEFAULT_HEIGHT = 10
     static COLOR = "#0095DD"
@@ -13,76 +15,59 @@ export class Paddle {
         this.y = 0
         this.width = Paddle.DEFAULT_WIDTH
         this.height = Paddle.DEFAULT_HEIGHT
-        this.direction = "bottom"
+        this.direction = Direction.BOTTOM
 
         this.bindMouseMove()
         Paddle.#instance = this
     }
 
     static getInstance(canvas) {
-        if (!Paddle.#instance) {
-        new Paddle(canvas)
-        }
-        return Paddle.#instance
+        return Paddle.#instance || new Paddle(canvas)
     }
 
     bindMouseMove() {
-        const self = this
+        $(this.canvas).on("mousemove", (e) => {
+            const rect = this.canvas.getBoundingClientRect()
+            const mouseX = e.clientX - rect.left
+            const mouseY = e.clientY - rect.top
 
-        $(this.canvas).on("mousemove", function (e) {
-        const rect = self.canvas.getBoundingClientRect()
-        const mouseX = e.clientX - rect.left
-        const mouseY = e.clientY - rect.top
+            // 각 방향별 거리 계산
+            const distances = new Map([
+                [Direction.TOP, mouseY],
+                [Direction.BOTTOM, this.canvas.height - mouseY],
+                [Direction.LEFT, mouseX],
+                [Direction.RIGHT, this.canvas.width - mouseX],
+            ])
 
-        const top = mouseY
-        const bottom = self.canvas.height - mouseY
-        const left = mouseX
-        const right = self.canvas.width - mouseX
+            // 가장 가까운 방향 선택
+            let nearestDirection = null
+            let minDistance = Infinity
 
-        const min = Math.min(top, bottom, left, right)
+            for (const [dir, dist] of distances) {
+                if (dist < minDistance) {
+                    minDistance = dist
+                    nearestDirection = dir
+                }
+            }
 
-        if (min == top) {
-            self.direction = "top"
-            self.width = Paddle.DEFAULT_WIDTH
-            self.height = Paddle.DEFAULT_HEIGHT
-            self.y = Paddle.MARGIN
-            self.x = mouseX - self.width / 2
-        } 
-        else if (min == bottom) {
-            self.direction = "bottom"
-            self.width = Paddle.DEFAULT_WIDTH
-            self.height = Paddle.DEFAULT_HEIGHT
-            self.y = self.canvas.height - self.height - Paddle.MARGIN
-            self.x = mouseX - self.width / 2
-        } 
-        else if (min == left) {
-            self.direction = "left"
-            self.width = Paddle.DEFAULT_HEIGHT
-            self.height = Paddle.DEFAULT_WIDTH
-            self.x = Paddle.MARGIN
-            self.y = mouseY - self.height / 2
-        } 
-        else if (min == right) {
-            self.direction = "right"
-            self.width = Paddle.DEFAULT_HEIGHT
-            self.height = Paddle.DEFAULT_WIDTH
-            self.x = self.canvas.width - self.width - Paddle.MARGIN
-            self.y = mouseY - self.height / 2
-        }
+            this.setPosition(nearestDirection, mouseX, mouseY)
+            this.clamp()
+        })
+    }
 
-        self.clamp()
+    setPosition(direction, mouseX, mouseY) {
+        this.direction = direction
+
+        direction.setPosition(this, mouseX, mouseY, {
+            DEFAULT_WIDTH: Paddle.DEFAULT_WIDTH,
+            DEFAULT_HEIGHT: Paddle.DEFAULT_HEIGHT,
+            MARGIN: Paddle.MARGIN,
         })
     }
 
     clamp() {
-        if (this.x < 0) this.x = 0
-        if (this.x + this.width > this.canvas.width) {
-        this.x = this.canvas.width - this.width
-        }
-        if (this.y < 0) this.y = 0
-        if (this.y + this.height > this.canvas.height) {
-        this.y = this.canvas.height - this.height
-        }
+        this.x = Math.max(0, Math.min(this.x, this.canvas.width - this.width))
+        this.y = Math.max(0, Math.min(this.y, this.canvas.height - this.height))
     }
 
     draw(ctx) {
@@ -93,3 +78,6 @@ export class Paddle {
         ctx.closePath()
     }
 }
+
+
+export default Paddle
