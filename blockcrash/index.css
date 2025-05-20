@@ -1,0 +1,133 @@
+body {
+  font-family: "Do Hyeon";
+}
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+img {
+  border: 0;
+}
+.screen {
+  width: 100vw;
+  height: 100vh;
+}
+#startScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3171d7;
+}
+#start {
+  position: relative;
+  width: 966px;
+  height: 673px;
+}
+#startImg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: 10px;
+  border: 10px solid #414141;
+}
+#buttonContainer {
+  display: flex;
+  justify-content: space-around;
+  width: inherit;
+  position: absolute;
+  bottom: 58px;
+}
+.startButton {
+  padding: 15px 67px;
+  border-radius: 15px;
+  border: 10px solid #3d6eb9;
+  background: #048def;
+  color: #f4df1e;
+  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-color: #000;
+  font-size: 64px;
+  font-weight: 400;
+  font-family: "Do Hyeon";
+}
+.startButton:hover {
+  border-radius: 15px;
+  border: 10px solid #2f94cc;
+  background: #01b3e8;
+}
+
+#level {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #0ddfff;
+}
+#level > h3 {
+  color: #cfffff;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #2497bf;
+  font-size: 96px;
+  font-weight: 400;
+  margin-bottom: 15px;
+  width: 1012px;
+  text-align: start;
+  margin: 0;
+  font-family: "Do Hyeon";
+}
+#levelButtonContainer {
+  display: flex;
+  margin-bottom: 45px;
+}
+.levelButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 344px;
+  height: 470px;
+  border-radius: 15px;
+  border: 5px solid #0160e2;
+  background: #08c6fe;
+}
+.levelButton > span {
+  color: #b7f1f4;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #026ed4;
+  font-size: 64px;
+  font-weight: 400;
+  font-family: "Do Hyeon";
+}
+.levelButton:hover {
+  border-radius: 15px;
+  border: 5px solid #6d15af;
+  background: #dd1dfe;
+}
+.levelButton:hover > span {
+  color: #f4c1ff;
+  -webkit-text-stroke-color: #8407bd;
+}
+.levelButton:nth-of-type(2):checked ~ #selectLevel {
+  display: flex;
+  gap: 68px;
+}
+.selectLevelButton {
+  width: 276px;
+  height: 73px;
+  border-radius: 10px;
+  border: 3px solid #0160e2;
+  background: #008bfa;
+  color: #d6fdfd;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #0160e2;
+  font-size: 48px;
+  font-weight: 400;
+  font-family: "Do Hyeon";
+}
+.selectLevelButton:hover {
+  width: 290px;
+  height: 85px;
+}
