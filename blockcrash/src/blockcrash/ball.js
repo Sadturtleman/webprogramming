@@ -1,24 +1,29 @@
-import Direction from "./direction.js"
-
 class Ball {
     static RADIUS = 10
     static COLOR = "#DD3333"
 
-    constructor(x, y, dx = 2, dy = -2, canvas, paddle) {
+    constructor(x, y, dx = 2, dy = -2, canvas) {
         this.x = x
         this.y = y
         this.dx = dx
         this.dy = dy
         this.canvas = canvas
-        this.paddle = paddle
         this.die = false
+        this.collisionManager = null
+    }
+
+    setCollisionManager(manager) {
+        this.collisionManager = manager
     }
 
     move() {
         if (this.die) return
 
         this.checkWallCollision()
-        this.checkPaddleCollision()
+
+        if (this.collisionManager) {
+            this.collisionManager.handle(this)
+        }
 
         this.x += this.dx
         this.y += this.dy
@@ -50,18 +55,6 @@ class Ball {
         }
     }
 
-    checkPaddleCollision() {
-        const direction = this.paddle.direction
-
-        if (direction.checkCollision(this, this.paddle, Ball.RADIUS)) {
-            if (direction === Direction.TOP || direction === Direction.BOTTOM) {
-                this.bounceY()
-            } else {
-                this.bounceX()
-            }
-        }
-    }
-
     draw(ctx) {
         this.move()
         ctx.beginPath()
@@ -71,6 +64,5 @@ class Ball {
         ctx.closePath()
     }
 }
-
 
 export default Ball
