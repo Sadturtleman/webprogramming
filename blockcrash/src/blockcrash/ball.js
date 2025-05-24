@@ -56,7 +56,6 @@ class Ball {
     }
 
     draw(ctx) {
-        this.move()
         ctx.beginPath()
         ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2)
         ctx.fillStyle = Ball.COLOR
