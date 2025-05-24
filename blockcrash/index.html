@@ -1,22 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Ball Bounce Demo</title>
-  <style>
-    canvas {
-      border: 1px solid black;
-      background-color: #eee;
-      display: block;
-      margin: 0 auto;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="gameCanvas" width="480" height="320"></canvas>
+  <head>
+    <title>Ball Bounce Demo</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+        background-color: #eee;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap"
+      rel="stylesheet"
+    />
+    <link href="index.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="startScreen" class="screen">
+      <div id="start">
+        <img id="startImg" src="assets/startImg.png" alt="시작 이미지" />
+        <div id="buttonContainer">
+          <button class="startButton">게임방법</button>
+          <button class="startButton">게임시작</button>
+        </div>
+      </div>
+    </div>
+    <div id="level" class="screen">
+      <h3>난이도 선택</h3>
+      <div id="levelButtonContainer">
+        <button class="levelButton">
+          <span>EASY</span>
+          <img src="assets/easy.png" alt="난이도 쉬움 선택" />
+        </button>
+        <button class="levelButton">
+          <span>NORMAL</span>
+          <img src="assets/normal.png" alt="난이도 보통 선택" />
+        </button>
+        <button class="levelButton">
+          <span>HARD</span>
+          <img src="assets/hard.png" alt="난이도 어려움 선택" />
+        </button>
+      </div>
+      <div id="selectLevel">
+        <button class="selectLevelButton">확인</button>
+        <button class="selectLevelButton">취소</button>
+      </div>
+    </div>
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
 
-  <!-- jQuery CDN -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Main module -->
-  <script type="module" src="src/main.js"></script>
-</body>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Main module -->
+    <script type="module" src="src/main.js"></script>
+  </body>
 </html>
