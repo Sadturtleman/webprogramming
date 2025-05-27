@@ -44,13 +44,10 @@ class Ball {
     checkWallCollision() {
         const { width, height } = this.canvas
 
-        if (this.x < Ball.RADIUS || this.x > width - Ball.RADIUS) {
-            this.bounceX()
-        }
-        if (this.y < Ball.RADIUS) {
-            this.bounceY()
-        }
-        if (this.y + Ball.RADIUS > height) {
+        if (
+            this.x - Ball.RADIUS < 0 || this.x + Ball.RADIUS > width ||
+            this.y - Ball.RADIUS < 0 || this.y + Ball.RADIUS > height
+        ) {
             this.die = true
         }
     }
