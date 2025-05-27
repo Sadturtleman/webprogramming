@@ -101,7 +101,8 @@ img {
   font-weight: 400;
   font-family: "Do Hyeon";
 }
-.levelButton:hover {
+.levelButton:hover,
+.levelButton.selected{
   border-radius: 15px;
   border: 5px solid #6d15af;
   background: #dd1dfe;
