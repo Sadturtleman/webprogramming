@@ -1,26 +1,30 @@
 class Lives {
-  constructor(maxLives = 3) {
-    this.max = maxLives
-    this.remaining = maxLives
-  }
+    constructor(max = 3) {
+        this.max = max;
+        this.current = max;
+        this.icon = new Image();
+        this.icon.src = "assets/heart.png";
+        this.iconSize = 32;
+    }
 
-  reset() {
-    this.remaining = this.max
-  }
+    reset() {
+        this.current = this.max;
+    }
 
-  lose() {
-    this.remaining--
-  }
+    lose() {
+        if (this.current > 0) {
+            this.current--;
+        }
+    }
 
-  isDead() {
-    return this.remaining <= 0
-  }
+    isDead() {
+        return this.current <= 0;
+    }
 
-  draw(ctx) {
-    ctx.font = "20px Do Hyeon"
-    ctx.fillStyle = "#ffffff"
-    ctx.fillText("목숨: " + this.remaining, 20, 30)
-  }
+    draw(ctx) {
+        for (let i = 0; i < this.current; i++) {
+            ctx.drawImage(this.icon, 10 + i * (this.iconSize + 5), 10, this.iconSize, this.iconSize);
+        }
+    }
 }
-
-export default Lives
+export default Lives;
