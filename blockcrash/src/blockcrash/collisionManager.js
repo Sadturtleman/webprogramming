@@ -14,6 +14,10 @@ class CollisionManager {
             }
         }
     }
+
+    reset() {
+        this.collidables = []
+    }
 }
 
 export default CollisionManager

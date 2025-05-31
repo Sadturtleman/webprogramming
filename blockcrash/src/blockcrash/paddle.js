@@ -2,11 +2,36 @@ import Direction from "../interface/direction.js"
 import ICollidable from "../interface/icollidable.js"
 
 class Paddle extends ICollidable {
-    static DEFAULT_WIDTH = 75
-    static DEFAULT_HEIGHT = 10
+    static DEFAULT_WIDTH = 150
+    static DEFAULT_HEIGHT = 60
     static COLOR = "#0095DD"
     static MARGIN = 10
     static #instance = null
+
+    static IMAGE_PATHS = {
+        [Direction.TOP]: "assets/paddleboard1.png",
+        [Direction.BOTTOM]: "assets/paddleboard2.png",
+        [Direction.LEFT]: "assets/paddleboard4.png",
+        [Direction.RIGHT]: "assets/paddleboard3.png",
+    }
+
+    static IMAGES = {}
+
+    // ✅ 모든 방향 이미지 미리 로딩
+    static loadMainImage() {
+        for (const direction of Object.values(Direction)) {
+            if (!Paddle.IMAGES[direction]) {
+                Paddle.loadImageForDirection(direction)
+            }
+        }
+    }
+
+    static loadImageForDirection(direction) {
+        const path = Paddle.IMAGE_PATHS[direction]
+        const img = new Image()
+        img.src = path
+        Paddle.IMAGES[direction] = img
+    }
 
     constructor(canvas) {
         super()
@@ -81,6 +106,11 @@ class Paddle extends ICollidable {
             this.x = this.canvas.width - this.width - MARGIN
             this.y = mouseY - this.height / 2
         }
+
+        // 보장용: 해당 방향 이미지가 없으면 로드
+        if (!Paddle.IMAGES[direction]) {
+            Paddle.loadImageForDirection(direction)
+        }
     }
 
     clamp() {
@@ -113,11 +143,16 @@ class Paddle extends ICollidable {
     }
 
     draw(ctx) {
-        ctx.beginPath()
-        ctx.rect(this.x, this.y, this.width, this.height)
-        ctx.fillStyle = Paddle.COLOR
-        ctx.fill()
-        ctx.closePath()
+        const image = Paddle.IMAGES[this.direction]
+        if (image && image.complete) {
+            ctx.drawImage(image, this.x, this.y, this.width, this.height)
+        } else {
+            ctx.beginPath()
+            ctx.rect(this.x, this.y, this.width, this.height)
+            ctx.fillStyle = Paddle.COLOR
+            ctx.fill()
+            ctx.closePath()
+        }
     }
 }
 
