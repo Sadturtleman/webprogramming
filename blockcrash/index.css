@@ -109,7 +109,7 @@ img {
   font-family: "Do Hyeon";
 }
 .levelButton:hover,
-.levelButton.selected{
+.levelButton.selected {
   border-radius: 15px;
   border: 5px solid #6d15af;
   background: #dd1dfe;
@@ -267,5 +267,5 @@ img {
 
 /* 게임시작 시 캔버스 숨김 */
 #gameCanvas {
-  display: none
+  display: none;
 }
