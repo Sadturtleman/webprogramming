@@ -14,6 +14,13 @@ class CollisionManager {
             }
         }
     }
+    handleItem(item) {
+    for (const obj of this.collidables) {
+        if (obj.checkCollisionWithItem && obj.checkCollisionWithItem(item)) {
+            obj.onCollisionWithItem?.(item)
+        }
+    }
+    }
 
     reset() {
         this.collidables = []

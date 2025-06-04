@@ -1,5 +1,6 @@
 import Direction from "../interface/direction.js"
 import ICollidable from "../interface/icollidable.js"
+import Item from "./item.js"
 
 class Paddle extends ICollidable {
     static DEFAULT_WIDTH = 150
@@ -133,14 +134,43 @@ class Paddle extends ICollidable {
                 return ball.x + r >= x && ball.x <= x + width && ball.y >= y && ball.y <= y + height
         }
     }
+    checkCollisionWithItem(item) {
+        const size = Item.SIZE
+        return (
+            this.x < item.x + size &&
+            this.x + this.width > item.x &&
+            this.y < item.y + size &&
+            this.y + this.height > item.y
+        )
+    }
 
     onCollision(ball) {
-        if (this.direction === Direction.TOP || this.direction === Direction.BOTTOM) {
-            ball.bounceY()
+        if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
+            const relativeX = ball.x - this.x
+            const offsetRatio = (relativeX / this.width - 0.5) * 2  // -1(left) ~ 1(right)
+
+            ball.bounceWithAngle(offsetRatio)
+
+            // 🎯 위치 보정
+            if (this.direction == Direction.TOP) {
+                ball.y = this.y + this.height + ball.constructor.RADIUS
+            } else {
+                ball.y = this.y - ball.constructor.RADIUS
+            }
+
         } else {
             ball.bounceX()
+
+            // 🎯 위치 보정 (좌우 패들일 경우)
+            if (this.direction == Direction.LEFT) {
+                ball.x = this.x + this.width + ball.constructor.RADIUS
+            } else {
+                ball.x = this.x - ball.constructor.RADIUS
+            }
         }
     }
+
+
 
     draw(ctx) {
         const image = Paddle.IMAGES[this.direction]
@@ -154,6 +184,29 @@ class Paddle extends ICollidable {
             ctx.closePath()
         }
     }
+
+    enlarge() {
+        this.width *= 1.5
+        this.height *= 1.5
+
+        // 일정 시간 후 원래 크기로 복구
+        setTimeout(() => {
+            this.width = Paddle.DEFAULT_WIDTH
+            this.height = Paddle.DEFAULT_HEIGHT
+        }, 5000)
+    }
+
+    shrink() {
+        this.width *= 0.7
+        this.height *= 0.7
+
+        // 5초 후 원래 크기로 복원
+        setTimeout(() => {
+            this.width = Paddle.DEFAULT_WIDTH
+            this.height = Paddle.DEFAULT_HEIGHT
+        }, 5000)
+    }
+
 }
 
 export default Paddle

@@ -91,7 +91,7 @@ function draw() {
 
       // 아이템 생성 확률
       if (Math.random() < 0.3) {
-        const types = ["life", "score", "expand", "shrink", "speedUp", "speedDown"]
+        const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"]
         const type = types[Math.floor(Math.random() * types.length)]
         items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type))
       }
@@ -101,17 +101,16 @@ function draw() {
   // 아이템 그리기 + Paddle 충돌 확인
   for (const item of items) {
     if (!item.collected) {
+      item.update()
       item.draw(ctx)
       if (paddle.checkCollisionWithItem(item)) {
         item.collect()
 
         // 아이템 효과 처리
-        if (item.type === "life") lives.gain()
-        else if (item.type === "score") score.addPoint(3)
-        else if (item.type === "expand") paddle.enlarge()
+        if (item.type === "expand") paddle.enlarge()
         else if (item.type === "shrink") paddle.shrink()
-        else if (item.type === "speedUp") ball?.adjustSpeed?.(1.2)
-        else if (item.type === "speedDown") ball?.adjustSpeed?.(0.8)
+        else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2)
+        else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8)
       }
     }
   }
@@ -126,8 +125,11 @@ function draw() {
   }
 
   score.draw(ctx, canvas)
+
+  // ✅ 무조건 호출되어야 함 (루프 유지)
   requestAnimationFrame(draw)
 }
+
 
 function resetToStart() {
   showGameOverImg = false
