@@ -132,3 +132,8 @@ img {
   width: 290px;
   height: 85px;
 }
+
+/* 게임시작 시 캔버스 숨김 */
+#gameCanvas {
+  display: none
+}
