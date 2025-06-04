@@ -133,14 +133,28 @@ class Paddle extends ICollidable {
                 return ball.x + r >= x && ball.x <= x + width && ball.y >= y && ball.y <= y + height
         }
     }
+    checkCollisionWithItem(item) {
+        const { x, y, width, height } = this
+        const itemX = item.x
+        const itemY = item.y
+        const itemSize = item.constructor.SIZE || 20 // 기본 사이즈 지정
 
+        const overlapX = itemX + itemSize >= x && itemX <= x + width
+        const overlapY = itemY + itemSize >= y && itemY <= y + height
+
+        return overlapX && overlapY
+    }
     onCollision(ball) {
         if (this.direction === Direction.TOP || this.direction === Direction.BOTTOM) {
-            ball.bounceY()
+            const relativeX = ball.x - this.x
+            const offsetRatio = (relativeX / this.width - 0.5) * 2  // -1(left) ~ 1(right)
+
+            ball.bounceWithAngle(offsetRatio)
         } else {
-            ball.bounceX()
+            ball.bounceX() // 좌우 패들은 그냥 수평 반사
         }
     }
+
 
     draw(ctx) {
         const image = Paddle.IMAGES[this.direction]
@@ -154,6 +168,29 @@ class Paddle extends ICollidable {
             ctx.closePath()
         }
     }
+
+    enlarge() {
+        this.width *= 1.5
+        this.height *= 1.5
+
+        // 일정 시간 후 원래 크기로 복구
+        setTimeout(() => {
+            this.width = Paddle.DEFAULT_WIDTH
+            this.height = Paddle.DEFAULT_HEIGHT
+        }, 5000)
+    }
+
+    shrink() {
+        this.width *= 0.7
+        this.height *= 0.7
+
+        // 5초 후 원래 크기로 복원
+        setTimeout(() => {
+            this.width = Paddle.DEFAULT_WIDTH
+            this.height = Paddle.DEFAULT_HEIGHT
+        }, 5000)
+    }
+
 }
 
 export default Paddle
