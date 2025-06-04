@@ -27,6 +27,12 @@ const lives = new Lives()
 const score = new Score()
 const sound = new SoundManager()
 
+// 화면 전환 관련
+function showScreen(id) {
+  $(".screen").hide()
+  $(id).show()
+}
+
 // 🎯 승리/패배 이미지 관련
 let gameOverImg = new Image()
 gameOverImg.src = "assets/loseImg.png"
@@ -152,18 +158,17 @@ function resetToStart() {
   collisionManager.add(paddle)
 
   // UI 복원
-  $("#startScreen").show()
-  $("#readyScreen").hide()
-  $("#level").hide()
-
-  // 사운드 전환
+  showScreen("#startScreen")
+  $("#gameCanvas").hide()
   sound.play("start")
 }
 
+$(document).ready(() => {
+  showScreen("#startScreen")
+})
 
 $("#gameStart").click(function () {
-  $("#startScreen").hide()
-  $("#level").show()
+  showScreen("#level")
   sound.play("lobby")
 })
 
@@ -174,6 +179,8 @@ $(".levelButton").click(function () {
 
 $("#pass").click(function () {
   $(".levelButton").removeClass("selected")
+  showScreen("#startScreen")          
+  sound.play("start")
 })
 
 $("#levelselect").click(function () {
@@ -214,6 +221,7 @@ $("#levelselect").click(function () {
 
   $("#level").hide()
   $("#readyScreen").show()
+  $("#gameCanvas").show()  // 캔버스 보이기
   gameStarted = true
 })
 
