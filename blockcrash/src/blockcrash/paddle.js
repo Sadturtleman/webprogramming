@@ -148,8 +148,9 @@ class Paddle extends ICollidable {
         if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
             const relativeX = ball.x - this.x
             const offsetRatio = (relativeX / this.width - 0.5) * 2  // -1(left) ~ 1(right)
+            const verticalDir = this.direction === Direction.TOP ? 1 : -1
 
-            ball.bounceWithAngle(offsetRatio)
+            ball.bounceWithAngle(offsetRatio, verticalDir)
 
             // 🎯 위치 보정
             if (this.direction == Direction.TOP) {

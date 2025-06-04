@@ -56,14 +56,15 @@ class Ball {
         this.dy *= factor
     }
 
-    bounceWithAngle(offsetRatio) {
+    bounceWithAngle(offsetRatio, verticalDir = -1) {
         const speed = Math.sqrt(this.dx ** 2 + this.dy ** 2)
         const maxAngle = Math.PI / 3  // 최대 60도
 
-        const angle = offsetRatio * maxAngle  // -1 ~ 1 범위
+        const angle = offsetRatio * maxAngle
         this.dx = speed * Math.sin(angle)
-        this.dy = -Math.abs(speed * Math.cos(angle))  // 항상 위로 반사
+        this.dy = verticalDir * Math.abs(speed * Math.cos(angle))  // 위(-1) 또는 아래(+1)
     }
+
 
 
     draw(ctx) {
