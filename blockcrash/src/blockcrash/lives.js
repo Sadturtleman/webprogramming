@@ -1,30 +1,42 @@
 class Lives {
-    constructor(max = 3) {
-        this.max = max;
-        this.current = max;
-        this.icon = new Image();
-        this.icon.src = "assets/heart.png";
-        this.iconSize = 32;
-    }
+  constructor(max = 3) {
+    this.max = max
+    this.life = max
+    this.container = document.getElementById("lifeContainer")
+    this.render()
+  }
 
-    reset() {
-        this.current = this.max;
-    }
+  lose() {
+    this.life = Math.max(0, this.life - 1)
+    this.render()
+  }
 
-    lose() {
-        if (this.current > 0) {
-            this.current--;
-        }
-    }
+  gain() {
+    this.life = Math.min(this.life + 1, this.max)
+    this.render()
+  }
 
-    isDead() {
-        return this.current <= 0;
-    }
+  reset() {
+    this.life = this.max
+    this.render()
+  }
 
-    draw(ctx) {
-        for (let i = 0; i < this.current; i++) {
-            ctx.drawImage(this.icon, 10 + i * (this.iconSize + 5), 10, this.iconSize, this.iconSize);
-        }
+  isDead() {
+    return this.life <= 0
+  }
+
+  render() {
+    if (!this.container) return
+
+    this.container.innerHTML = ""
+
+    for (let i = 0; i < this.life; i++) {
+      const heart = document.createElement("img")
+      heart.src = "assets/heart.png"
+      heart.className = "life"
+      this.container.appendChild(heart)
     }
+  }
 }
+
 export default Lives;

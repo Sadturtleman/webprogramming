@@ -6,6 +6,9 @@ import levelManager from "./blockcrash/levelManager.js"
 import Lives from "./blockcrash/lives.js"
 import Score from "./blockcrash/score.js"
 import SoundManager from "./blockcrash/soundManager.js"
+import Item from "./blockcrash/item.js"
+
+const items = []
 
 const canvas = $("#gameCanvas")[0]
 const ctx = canvas.getContext("2d")
@@ -24,7 +27,9 @@ const lives = new Lives()
 const score = new Score()
 const sound = new SoundManager()
 
-// 🎯 승리/패배 이미지 관련
+paddle.lives = lives
+paddle.score = score
+
 let gameOverImg = new Image()
 gameOverImg.src = "assets/loseImg.png"
 let showGameOverImg = false
@@ -54,6 +59,7 @@ function draw() {
         ctx.drawImage(victoryImg, x, y, 300, 150)
       }
 
+      requestAnimationFrame(draw)
       return
     }
 
@@ -69,9 +75,7 @@ function draw() {
         showGameOverImg = true
         ball = null
         sound.playGameOver()
-
         setTimeout(resetToStart, 3000)
-        return
       }
     }
   }
@@ -84,23 +88,44 @@ function draw() {
     if (brick.destroyed && !brick.counted) {
       score.addPoint()
       brick.counted = true
+
+      // 아이템 생성 확률
+      if (Math.random() < 0.3) {
+        const types = ["life", "score", "expand", "shrink", "speedUp", "speedDown"]
+        const type = types[Math.floor(Math.random() * types.length)]
+        items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type))
+      }
     }
   }
 
-  // 🎉 모든 벽돌 제거 = 승리
+  // 아이템 그리기 + Paddle 충돌 확인
+  for (const item of items) {
+    if (!item.collected) {
+      item.draw(ctx)
+      if (paddle.checkCollisionWithItem(item)) {
+        item.collect()
+
+        // 아이템 효과 처리
+        if (item.type === "life") lives.gain()
+        else if (item.type === "score") score.addPoint(3)
+        else if (item.type === "expand") paddle.enlarge()
+        else if (item.type === "shrink") paddle.shrink()
+        else if (item.type === "speedUp") ball?.adjustSpeed?.(1.2)
+        else if (item.type === "speedDown") ball?.adjustSpeed?.(0.8)
+      }
+    }
+  }
+
+  // 승리 체크
   const allDestroyed = bricks.length > 0 && bricks.every(b => b.destroyed)
   if (allDestroyed && !showVictoryImg) {
     showVictoryImg = true
     sound.playVictory()
     ball = null
-
     setTimeout(resetToStart, 3000)
-    return
   }
 
-  lives.draw(ctx)
   score.draw(ctx, canvas)
-
   requestAnimationFrame(draw)
 }
 
@@ -111,9 +136,10 @@ function resetToStart() {
   bricks = []
   ball = null
   level = null
+  items.length = 0
   gameStarted = false
 
-  collisionManager.collidables = []
+  collisionManager.reset()
   collisionManager.add(paddle)
 
   $("#startScreen").show()
@@ -139,20 +165,13 @@ $("#pass").click(function () {
 })
 
 $("#levelselect").click(function () {
-  if ($(".levelButton.selected").length == 0) {
+  if ($(".levelButton.selected").length === 0) {
     alert("난이도를 선택하세요.")
     return
   }
 
   const selectedBtn = $(".levelButton.selected img").attr("id")
-
-  if (selectedBtn == "easygame") {
-    level = "EASY"
-  } else if (selectedBtn == "normalgame") {
-    level = "NORMAL"
-  } else if (selectedBtn == "hardgame") {
-    level = "HARD"
-  }
+  level = selectedBtn === "easygame" ? "EASY" : selectedBtn === "normalgame" ? "NORMAL" : "HARD"
 
   levelManager.setLevel(level)
   lives.reset()
@@ -170,10 +189,7 @@ $("#levelselect").click(function () {
   ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas)
   ball.setCollisionManager(collisionManager)
 
-  // 🎵 난이도별 배경 음악
-  if (level === "EASY") sound.play("game1")
-  else if (level === "NORMAL") sound.play("game2")
-  else if (level === "HARD") sound.play("game3")
+  sound.play(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3")
 
   $("#level").hide()
   $("#readyScreen").show()

@@ -28,8 +28,8 @@ class BrickFactory {
         break
     }
 
-    const brickWidth = 60
-    const brickHeight = 20
+    const brickWidth = 80
+    const brickHeight = 80
     const margin = 10
     const offsetTop = 50
     const totalWidth = cols * (brickWidth + margin) - margin
