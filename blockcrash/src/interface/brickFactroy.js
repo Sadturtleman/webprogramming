@@ -9,20 +9,20 @@ class BrickFactory {
 
     switch (difficulty) {
       case "EASY":
-        rows = 3
-        cols = 5
+        rows = 5
+        cols = 8
         hitCount = 1
         image = brickImages.EASY
         break
       case "NORMAL":
         rows = 5
-        cols = 7
+        cols = 8
         hitCount = 2
         image = brickImages.NORMAL
         break
       case "HARD":
-        rows = 6
-        cols = 9
+        rows = 5
+        cols = 8
         hitCount = 3
         image = brickImages.HARD
         break
@@ -30,7 +30,7 @@ class BrickFactory {
 
     const brickWidth = 80
     const brickHeight = 80
-    const margin = 10
+    const margin = 5
     const offsetTop = 50
     const totalWidth = cols * (brickWidth + margin) - margin
     const offsetLeft = (canvasWidth - totalWidth) / 2
