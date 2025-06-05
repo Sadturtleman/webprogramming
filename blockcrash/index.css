@@ -133,6 +133,21 @@ img {
   height: 85px;
 }
 
+#lifeContainer {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  z-index: 10;
+}
+
+.life {
+  width: 32px;
+  height: 32px;
+}
+
 /* 게임시작 시 캔버스 숨김 */
 #gameCanvas {
   display: none

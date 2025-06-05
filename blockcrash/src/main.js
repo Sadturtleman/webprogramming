@@ -33,7 +33,9 @@ function showScreen(id) {
   $(id).show()
 }
 
-// 🎯 승리/패배 이미지 관련
+paddle.lives = lives
+paddle.score = score
+
 let gameOverImg = new Image()
 gameOverImg.src = "assets/loseImg.png"
 let showGameOverImg = false
@@ -51,7 +53,6 @@ function draw() {
 
   if (gameStarted) {
     if (!ball) {
-      // 게임 오버 or 승리 이미지 표시
       if (showGameOverImg && gameOverImg.complete) {
         const x = (canvas.width - 300) / 2
         const y = (canvas.height - 150) / 2
@@ -64,7 +65,6 @@ function draw() {
         ctx.drawImage(victoryImg, x, y, 300, 150)
       }
 
-      // draw 루프는 반드시 유지
       requestAnimationFrame(draw)
       return
     }
@@ -95,38 +95,33 @@ function draw() {
       score.addPoint()
       brick.counted = true
 
-      // 아이템 생성
+      // 아이템 생성 확률
       if (Math.random() < 0.3) {
-        const types = ["paddlebuff", "speedbuff", "paddlebuff", "speeddebuff"]
+        const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"]
         const type = types[Math.floor(Math.random() * types.length)]
         items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type))
       }
     }
   }
 
+  // 아이템 그리기 + Paddle 충돌 확인
   for (const item of items) {
     if (!item.collected) {
+      item.update()
       item.draw(ctx)
-
       if (paddle.checkCollisionWithItem(item)) {
         item.collect()
 
-        // 🎯 효과 적용
-        if (item.type == "paddlebuff") {
-          paddle.shrink()
-        } else if (item.type == "paddlebuff") {
-          paddle.enlarge()
-        } else if (item.type == "speedbuff") {
-          if (ball) ball.adjustSpeed(0.8)
-        } else if (item.type == "speeddebuff"){
-          if (ball) ball.adjustSpeed(1.2) 
-        }
+        // 아이템 효과 처리
+        if (item.type === "expand") paddle.enlarge()
+        else if (item.type === "shrink") paddle.shrink()
+        else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2)
+        else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8)
       }
     }
   }
 
-
-  // 승리 조건 체크
+  // 승리 체크
   const allDestroyed = bricks.length > 0 && bricks.every(b => b.destroyed)
   if (allDestroyed && !showVictoryImg) {
     showVictoryImg = true
@@ -135,37 +130,33 @@ function draw() {
     setTimeout(resetToStart, 3000)
   }
 
-  lives.draw(ctx)
   score.draw(ctx, canvas)
 
-  requestAnimationFrame(draw) // 항상 루프 유지
+  // ✅ 무조건 호출되어야 함 (루프 유지)
+  requestAnimationFrame(draw)
 }
 
 
 function resetToStart() {
-  // 게임 상태 초기화
   showGameOverImg = false
   showVictoryImg = false
   backgroundImg = null
   bricks = []
-  items.length = 0
   ball = null
   level = null
+  items.length = 0
   gameStarted = false
 
-  // 충돌 목록 초기화
-  collisionManager.collidables = []
+  collisionManager.reset()
   collisionManager.add(paddle)
 
-  // UI 복원
-  showScreen("#startScreen")
-  $("#gameCanvas").hide()
+  $("#startScreen").show()
+  $("#readyScreen").hide()
+  $("#level").hide()
+
   sound.play("start")
 }
 
-$(document).ready(() => {
-  showScreen("#startScreen")
-})
 
 $("#gameStart").click(function () {
   showScreen("#level")
@@ -184,20 +175,13 @@ $("#pass").click(function () {
 })
 
 $("#levelselect").click(function () {
-  if ($(".levelButton.selected").length == 0) {
-    alert("\ub09c\uc774\ub3c4\ub97c \uc120\ud0dd\ud558\uc138\uc694.")
+  if ($(".levelButton.selected").length === 0) {
+    alert("난이도를 선택하세요.")
     return
   }
 
   const selectedBtn = $(".levelButton.selected img").attr("id")
-
-  if (selectedBtn == "easygame") {
-    level = "EASY"
-  } else if (selectedBtn == "normalgame") {
-    level = "NORMAL"
-  } else if (selectedBtn == "hardgame") {
-    level = "HARD"
-  }
+  level = selectedBtn === "easygame" ? "EASY" : selectedBtn === "normalgame" ? "NORMAL" : "HARD"
 
   levelManager.setLevel(level)
   lives.reset()
@@ -215,9 +199,7 @@ $("#levelselect").click(function () {
   ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas)
   ball.setCollisionManager(collisionManager)
 
-  if (level === "EASY") sound.play("game1")
-  else if (level === "NORMAL") sound.play("game2")
-  else if (level === "HARD") sound.play("game3")
+  sound.play(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3")
 
   $("#level").hide()
   $("#readyScreen").show()

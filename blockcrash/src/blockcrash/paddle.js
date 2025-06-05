@@ -1,5 +1,6 @@
 import Direction from "../interface/direction.js"
 import ICollidable from "../interface/icollidable.js"
+import Item from "./item.js"
 
 class Paddle extends ICollidable {
     static DEFAULT_WIDTH = 150
@@ -134,26 +135,42 @@ class Paddle extends ICollidable {
         }
     }
     checkCollisionWithItem(item) {
-        const { x, y, width, height } = this
-        const itemX = item.x
-        const itemY = item.y
-        const itemSize = item.constructor.SIZE || 20 // 기본 사이즈 지정
-
-        const overlapX = itemX + itemSize >= x && itemX <= x + width
-        const overlapY = itemY + itemSize >= y && itemY <= y + height
-
-        return overlapX && overlapY
+        const size = Item.SIZE
+        return (
+            this.x < item.x + size &&
+            this.x + this.width > item.x &&
+            this.y < item.y + size &&
+            this.y + this.height > item.y
+        )
     }
+
     onCollision(ball) {
-        if (this.direction === Direction.TOP || this.direction === Direction.BOTTOM) {
+        if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
             const relativeX = ball.x - this.x
             const offsetRatio = (relativeX / this.width - 0.5) * 2  // -1(left) ~ 1(right)
+            const verticalDir = this.direction === Direction.TOP ? 1 : -1
 
-            ball.bounceWithAngle(offsetRatio)
+            ball.bounceWithAngle(offsetRatio, verticalDir)
+
+            // 🎯 위치 보정
+            if (this.direction == Direction.TOP) {
+                ball.y = this.y + this.height + ball.constructor.RADIUS
+            } else {
+                ball.y = this.y - ball.constructor.RADIUS
+            }
+
         } else {
-            ball.bounceX() // 좌우 패들은 그냥 수평 반사
+            ball.bounceX()
+
+            // 🎯 위치 보정 (좌우 패들일 경우)
+            if (this.direction == Direction.LEFT) {
+                ball.x = this.x + this.width + ball.constructor.RADIUS
+            } else {
+                ball.x = this.x - ball.constructor.RADIUS
+            }
         }
     }
+
 
 
     draw(ctx) {
