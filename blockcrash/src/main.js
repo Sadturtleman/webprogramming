@@ -33,6 +33,10 @@ function showScreen(id) {
   $(id).show()
 }
 
+$(document).ready(() => {
+  showScreen("#startScreen")
+})
+
 paddle.lives = lives
 paddle.score = score
 
@@ -150,10 +154,8 @@ function resetToStart() {
   collisionManager.reset()
   collisionManager.add(paddle)
 
-  $("#startScreen").show()
-  $("#readyScreen").hide()
-  $("#level").hide()
-
+  showScreen("#startScreen")
+  $("#gameCanvas").hide()
   sound.play("start")
 }
 
