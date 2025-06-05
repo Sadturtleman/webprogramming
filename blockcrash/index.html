@@ -15,6 +15,9 @@
       rel="stylesheet"
     />
     <link href="index.css" rel="stylesheet" type="text/css" />
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="src/design.js"></script>
   </head>
   <body>
     <div id="startScreen" class="screen">
@@ -27,28 +30,30 @@
       </div>
     </div>
     <div id="level" class="screen">
-      <h3>난이도 선택</h3>
+      <div id="levelTitle">
+        <h3>난이도 선택</h3>
+        <img src="assets/setting.png" alt="설정 버튼" />
+      </div>
       <div id="levelButtonContainer">
         <button class="levelButton">
           <span>EASY</span>
-          <img src="assets/easy.png" id = "easygame" alt="난이도 쉬움 선택" />
+          <img src="assets/easy.png" alt="난이도 쉬움 선택" />
         </button>
         <button class="levelButton">
           <span>NORMAL</span>
-          <img src="assets/normal.png" id = "normalgame" alt="난이도 보통 선택" />
+          <img src="assets/normal.png" alt="난이도 보통 선택" />
         </button>
         <button class="levelButton">
           <span>HARD</span>
-          <img src="assets/hard.png" id = "hardgame" alt="난이도 어려움 선택" />
+          <img src="assets/hard.png" alt="난이도 어려움 선택" />
         </button>
       </div>
       <div id="selectLevel">
-        <button class="selectLevelButton" id = "levelselect">확인</button>
-        <button class="selectLevelButton" id = "pass">취소</button>
+        <button class="selectLevelButton">확인</button>
+        <button class="selectLevelButton">취소</button>
       </div>
     </div>
-    <canvas id="gameCanvas" width="720" height="720"></canvas>
-    <div id = "lifeContainer"></div>
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
 
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
