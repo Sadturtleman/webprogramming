@@ -15,6 +15,9 @@
       rel="stylesheet"
     />
     <link href="index.css" rel="stylesheet" type="text/css" />
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="src/design.js"></script>
   </head>
   <body>
     <div id="startScreen" class="screen">
@@ -22,29 +25,78 @@
         <img id="startImg" src="assets/startImg.png" alt="시작 이미지" />
         <div id="buttonContainer">
           <button class="startButton">게임방법</button>
-          <button class="startButton" id = "gameStart">게임시작</button>
+          <button class="startButton" id="gameStart">게임시작</button>
         </div>
       </div>
     </div>
     <div id="level" class="screen">
-      <h3>난이도 선택</h3>
+      <div id="levelTitle">
+        <h3>난이도 선택</h3>
+        <img src="assets/setting.png" alt="설정 버튼" />
+      </div>
       <div id="levelButtonContainer">
         <button class="levelButton">
           <span>EASY</span>
-          <img src="assets/easy.png" id = "easygame" alt="난이도 쉬움 선택" />
+          <img src="assets/easy.png" id="easygame" alt="난이도 쉬움 선택" />
         </button>
         <button class="levelButton">
           <span>NORMAL</span>
-          <img src="assets/normal.png" id = "normalgame" alt="난이도 보통 선택" />
+          <img src="assets/normal.png" id="normalgame" alt="난이도 보통 선택" />
         </button>
         <button class="levelButton">
           <span>HARD</span>
-          <img src="assets/hard.png" id = "hardgame" alt="난이도 어려움 선택" />
+          <img src="assets/hard.png" id="hardgame" alt="난이도 어려움 선택" />
         </button>
       </div>
       <div id="selectLevel">
-        <button class="selectLevelButton" id = "levelselect">확인</button>
-        <button class="selectLevelButton" id = "pass">취소</button>
+        <button class="selectLevelButton" id="levelselect">확인</button>
+        <button class="selectLevelButton" id="pass">취소</button>
+      </div>
+      <div id="settingOverlay">
+        <div id="setting">
+          <div id="settingTitle">
+            <h3>옵션</h3>
+            <img src="assets/settingExit.png" alt="설정 나가기" />
+          </div>
+          <div id="settingAudio">
+            <span>배경음악</span>
+            <div class="audioCheck">
+              <div class="audioCheckBox">
+                <img src="assets/check.png" alt="체크 이미지" />
+              </div>
+              <span>ON</span>
+            </div>
+            <div class="audioCheck">
+              <div class="audioCheckBox">
+                <img src="assets/check.png" alt="체크 이미지" />
+              </div>
+              <span>OFF</span>
+            </div>
+          </div>
+          <div id="settingBall">
+            <p>물풍선</p>
+            <div id="ballChecks">
+              <div class="ballCheck">
+                <img src="assets/settingBall.png" />
+                <div class="ballCheckBox">
+                  <img src="assets/check.png" alt="체크 이미지" />
+                </div>
+              </div>
+              <div class="ballCheck">
+                <img src="assets/settingBall2.png" />
+                <div class="ballCheckBox">
+                  <img src="assets/check.png" alt="체크 이미지" />
+                </div>
+              </div>
+              <div class="ballCheck">
+                <img src="assets/settingBall3.png" />
+                <div class="ballCheckBox">
+                  <img src="assets/check.png" alt="체크 이미지" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <canvas id="gameCanvas" width="720" height="720"></canvas>
