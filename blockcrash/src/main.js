@@ -27,6 +27,12 @@ const lives = new Lives()
 const score = new Score()
 const sound = new SoundManager()
 
+// 화면 전환 관련
+function showScreen(id) {
+  $(".screen").hide()
+  $(id).show()
+}
+
 paddle.lives = lives
 paddle.score = score
 
@@ -151,9 +157,9 @@ function resetToStart() {
   sound.play("start")
 }
 
+
 $("#gameStart").click(function () {
-  $("#startScreen").hide()
-  $("#level").show()
+  showScreen("#level")
   sound.play("lobby")
 })
 
@@ -164,6 +170,8 @@ $(".levelButton").click(function () {
 
 $("#pass").click(function () {
   $(".levelButton").removeClass("selected")
+  showScreen("#startScreen")          
+  sound.play("start")
 })
 
 $("#levelselect").click(function () {
@@ -195,6 +203,7 @@ $("#levelselect").click(function () {
 
   $("#level").hide()
   $("#readyScreen").show()
+  $("#gameCanvas").show()  // 캔버스 보이기
   gameStarted = true
 })
 
