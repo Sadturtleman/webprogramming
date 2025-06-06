@@ -2,15 +2,22 @@ class Ball {
     static RADIUS = 10
     static COLOR = "#DD3333"
 
-    constructor(x, y, dx = 2, dy = -2, canvas) {
-        this.x = x
-        this.y = y
-        this.dx = dx
-        this.dy = dy
-        this.canvas = canvas
-        this.die = false
-        this.collisionManager = null
+    constructor(x, y, dx = 10, dy = -10, canvas, imageObj) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.canvas = canvas;
+        this.die = false;
+        this.collisionManager = null;
+        this.image = imageObj; // 이제 imageObj는 미리 로드된 Image 객체
     }
+
+    changeImage(imgObj) {
+        this.image = imgObj;
+    }
+
+
 
     setCollisionManager(manager) {
         this.collisionManager = manager
@@ -66,14 +73,37 @@ class Ball {
     }
 
 
-
     draw(ctx) {
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2)
-        ctx.fillStyle = Ball.COLOR
-        ctx.fill()
-        ctx.closePath()
+        if (
+            this.image &&
+            this.image.complete &&
+            this.image.naturalWidth > 0 &&
+            this.image.naturalHeight > 0
+        ) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(
+            this.image,
+            this.x - Ball.RADIUS,
+            this.y - Ball.RADIUS,
+            Ball.RADIUS * 2,
+            Ball.RADIUS * 2
+            );
+            ctx.restore();
+        } else {
+            // fallback: 원형 색상 공
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = Ball.COLOR;
+            ctx.fill();
+            ctx.closePath();
+        }
     }
+
+
+
 }
 
 export default Ball

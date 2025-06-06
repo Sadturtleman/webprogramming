@@ -2,7 +2,7 @@ class Lives {
   constructor(max = 3) {
     this.max = max
     this.life = max
-    this.container = document.getElementById("lifeContainer")
+    this.container = document.getElementById("heartContainer")
     this.render()
   }
 

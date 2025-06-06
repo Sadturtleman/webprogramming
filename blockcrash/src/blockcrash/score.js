@@ -2,6 +2,8 @@ class Score {
   constructor() {
     this.score = 0
     this.pointPerBrick = 10
+    this.container = document.getElementById("timeText")
+    this.render()
   }
 
   reset(level) {
@@ -9,20 +11,21 @@ class Score {
     if (level === "EASY") this.pointPerBrick = 10
     else if (level === "NORMAL") this.pointPerBrick = 20
     else if (level === "HARD") this.pointPerBrick = 30
+    this.render()
   }
 
   addPoint() {
     this.score += this.pointPerBrick
+    this.render()
   }
 
   get() {
     return this.score
   }
 
-  draw(ctx, canvas) {
-    ctx.font = "20px Do Hyeon"
-    ctx.fillStyle = "#ffffff"
-    ctx.fillText("점수: " + this.score, canvas.width - 120, 30)
+  render(){
+    if (!this.container) return;
+    this.container.innerText = `점수 : ${this.score}`
   }
 }
 
