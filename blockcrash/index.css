@@ -268,4 +268,193 @@ img {
 /* 게임시작 시 캔버스 숨김 */
 #gameCanvas {
   display: none;
+  border-radius: 10px;
+  border: 10px solid #414141;
+  background: #d9d9d9;
+}
+#game {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #3171d7;
+  box-sizing: border-box;
+}
+#canvasContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 900px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+#itemContainer {
+  display: flex;
+  align-items: center;
+  padding: 0 35px;
+  gap: 15px;
+  width: 581px;
+  height: 90px;
+  border-radius: 15px 15px 0px 0px;
+  border: 3px solid #0160e2;
+  background: #0094ec;
+  position: absolute;
+  bottom: 0;
+}
+#itemContainer > span {
+  color: rgba(214, 253, 253, 0.87);
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #0160e2;
+  font-family: "Do Hyeon";
+  font-size: 36px;
+  font-weight: 400;
+  padding-right: 24px;
+}
+.item {
+  width: 80px;
+  height: 60px;
+  border-radius: 10px;
+  background: #0058b4;
+  position: relative;
+}
+.itemNumber {
+  color: rgba(214, 253, 253, 0.87);
+  font-family: "Do Hyeon";
+  font-size: 24px;
+  font-weight: 400;
+  position: absolute;
+  top: 2px;
+  left: 10px;
+}
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#heartContainer {
+  display: flex;
+  justify-content: space-around;
+  width: 340px;
+  height: 79px;
+  border-radius: 5px;
+  border: 3px solid #048def;
+  background: #003e8c;
+}
+#mainAside {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 340px;
+  height: 606px;
+  border-radius: 15px;
+  background: #299fee;
+}
+#timeContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 276px;
+  height: 71px;
+  border-radius: 15px;
+  border: 2px solid #0981d3;
+  background: #003e8c;
+}
+#timeText {
+  color: #86fffd;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #022858;
+  font-family: "Black Han Sans";
+  font-size: 40px;
+  font-weight: 600;
+}
+#time {
+  color: #ff8604;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #000;
+  font-family: "Black Han Sans";
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: 7.2px;
+}
+#users {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.user {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 276px;
+  height: 107px;
+  border-radius: 5px;
+  border: 2px solid #003e90;
+  background: #0665c6;
+}
+.userImg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 116px;
+  height: 76px;
+  border-radius: 5px;
+  border: 3px solid #0981d3;
+  background: #003e8c;
+}
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+.userInfoBox {
+  display: flex;
+  gap: 8px;
+}
+.userInfoBox1 {
+  width: 43px;
+  height: 38px;
+  border-radius: 5px;
+  border: 2px solid #003e8c;
+  background: #299fee;
+}
+.userInfoBox2 {
+  width: 86px;
+  height: 38px;
+  border-radius: 5px;
+  border: 3px solid #0981d3;
+  background: #003e8c;
+}
+.userName {
+  color: #fff;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #000;
+  font-family: Orbit;
+  font-size: 35px;
+  font-weight: 500;
+}
+#exit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 340px;
+  height: 84px;
+  border-radius: 5px;
+  border: 2px solid #054aa9;
+  background: #0655b5;
+}
+#exit > button {
+  width: 300px;
+  height: 69px;
+  border-radius: 5px;
+  border: 2px solid #0758b9;
+  background: #05a8ff;
+  color: rgba(252, 252, 252, 0.87);
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #0160e2;
+  font-family: "Do Hyeon";
+  font-size: 50px;
+  font-weight: 500;
+  letter-spacing: 4px;
 }

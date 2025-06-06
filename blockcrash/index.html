@@ -99,11 +99,69 @@
         </div>
       </div>
     </div>
-    <canvas id="gameCanvas" width="720" height="720"></canvas>
-    <div id = "lifeContainer"></div>
-
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <div id="game" class="screen">
+      <div id="canvasContainer">
+        <canvas id="gameCanvas" width="900" height="800"></canvas>
+        <div id="itemContainer">
+          <span>내아이템</span>
+          <div class="item"><span class="itemNumber">1</span></div>
+          <div class="item"><span class="itemNumber">2</span></div>
+          <div class="item"><span class="itemNumber">3</span></div>
+          <div class="item"><span class="itemNumber">4</span></div>
+        </div>
+      </div>
+      <aside>
+        <div id="heartContainer"></div>
+        <div id="mainAside">
+          <div id="timeContainer">
+            <span id="timeText">TIME</span><span id="time"></span>
+          </div>
+          <div id="users">
+            <div class="user">
+              <div class="userImg"><img src="assets/user1.png" /></div>
+              <div class="userInfo">
+                <div class="userInfoBox">
+                  <div class="userInfoBox1"></div>
+                  <div class="userInfoBox2"></div>
+                </div>
+                <span class="userName">웹프최고</span>
+              </div>
+            </div>
+            <div class="user">
+              <div class="userImg"><img src="assets/user2.png" /></div>
+              <div class="userInfo">
+                <div class="userInfoBox">
+                  <div class="userInfoBox1"></div>
+                  <div class="userInfoBox2"></div>
+                </div>
+                <span class="userName">웹프사랑</span>
+              </div>
+            </div>
+            <div class="user">
+              <div class="userImg"></div>
+              <div class="userInfo">
+                <div class="userInfoBox">
+                  <div class="userInfoBox1"></div>
+                  <div class="userInfoBox2"></div>
+                </div>
+                <span class="userName"> </span>
+              </div>
+            </div>
+            <div class="user">
+              <div class="userImg"></div>
+              <div class="userInfo">
+                <div class="userInfoBox">
+                  <div class="userInfoBox1"></div>
+                  <div class="userInfoBox2"></div>
+                </div>
+                <span class="userName"> </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="exit"><button>나가기</button></div>
+      </aside>
+    </div>
     <!-- Main module -->
     <script type="module" src="src/main.js" defer></script>
   </body>
