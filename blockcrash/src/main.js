@@ -705,21 +705,26 @@ class BrickFactory {
     const offsetTop = 50
     const totalWidth = cols * (brickWidth + margin) - margin
     const offsetLeft = (canvasWidth - totalWidth) / 2
+    const indestructiblepos = [[0, 2], [0, 7], [1, 4], [3, 1], [3, 5]];
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
+        const isObstacle =
+          difficulty === "HARD" &&
+          indestructiblepos.some(([r, c]) => r === row && c === col);
 
-        const isObstacle = difficulty === "HARD" && row === 4 && (col === 7 || col === 1)
-        const imageToUse = isObstacle ? brickImages.OBSTACLE : image
+        const imageToUse = isObstacle ? brickImages.OBSTACLE : image;
 
-        const x = offsetLeft + col * (brickWidth + margin)
-        const y = offsetTop + row * (brickHeight + margin)
+        const x = offsetLeft + col * (brickWidth + margin);
+        const y = offsetTop + row * (brickHeight + margin);
+
         const brick = new Brick(x, y, brickWidth, brickHeight, {
-          hitCount : isObstacle ? Infinity : hitCount,
-          image : imageToUse,
-          indestructible : isObstacle
-        })
-        bricks.push(brick)
+          hitCount: isObstacle ? Infinity : hitCount,
+          image: imageToUse,
+          indestructible: isObstacle,
+        });
+
+        bricks.push(brick);
       }
     }
 
@@ -801,7 +806,7 @@ function startLevel(selectedLevel) {
     brick.counted = false;
   }
 
-  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
   lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
   ball.setCollisionManager(collisionManager);
 
@@ -854,7 +859,7 @@ function draw() {
       lives.lose();
 
       if (!lives.isDead()) {
-        ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+        ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
         ball.setCollisionManager(collisionManager);
       } else {
         showGameOverImg = true;
@@ -1024,7 +1029,7 @@ $("#levelselect").click(() => {
     brick.counted = false;
   }
 
-  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
   lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
   ball.setCollisionManager(collisionManager);
 
