@@ -1,3 +1,4 @@
+// ===================== 모듈 임포트 ===================== //
 import Paddle from "./blockcrash/paddle.js";
 import Ball from "./blockcrash/ball.js";
 import CollisionManager from "./blockcrash/collisionManager.js";
@@ -8,67 +9,111 @@ import Score from "./blockcrash/score.js";
 import SoundManager from "./blockcrash/soundManager.js";
 import Item from "./blockcrash/item.js";
 
-const items = [];
 
+// ===================== 전역 상수 및 변수 ===================== //
 const canvas = $("#gameCanvas")[0];
 const ctx = canvas.getContext("2d");
 
-let backgroundImg = null;
-let bricks = [];
-let ball = null;
-let gameStarted = false;
-let level = null;
-
 const paddle = Paddle.getInstance(canvas);
 const collisionManager = new CollisionManager();
-collisionManager.add(paddle);
-
 const lives = new Lives();
 const score = new Score();
 const sound = new SoundManager();
 
-// 화면 전환 관련
-function showScreen(id) {
-  $(".screen").hide();
-  $(id).show();
-}
+const ballImages = {
+  ball1: new Image(),
+  ball2: new Image(),
+  ball3: new Image(),
+};
+ballImages.ball1.src = "assets/ball1.png";
+ballImages.ball2.src = "assets/ball2.png";
+ballImages.ball3.src = "assets/ball3.png";
 
-$(document).ready(() => {
-  showScreen("#startScreen");
-});
-
-paddle.lives = lives;
-paddle.score = score;
-
-let gameOverImg = new Image();
+const gameOverImg = new Image();
 gameOverImg.src = "assets/loseImg.png";
-let showGameOverImg = false;
 
-let victoryImg = new Image();
+const victoryImg = new Image();
 victoryImg.src = "assets/winImg.png";
+
+let selectedBallImage = null;
+let backgroundImg = null;
+let bricks = [];
+let items = [];
+let ball = null;
+let level = null;
+let gameStarted = false;
+let showGameOverImg = false;
 let showVictoryImg = false;
 
+collisionManager.add(paddle);
+
+
+// ===================== 이미지 로딩 및 초기 시작 ===================== //
+function loadImage(img) {
+  return new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+  });
+}
+
+function startLevel(selectedLevel) {
+  level = selectedLevel;
+  levelManager.setLevel(level);
+  lives.reset();
+  score.reset(level);
+
+  backgroundImg = new Image();
+  backgroundImg.src = `assets/map${level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3}.png`;
+
+  bricks = BrickFactory.createBricks(level, canvas.width);
+  for (const brick of bricks) {
+    collisionManager.add(brick);
+    brick.counted = false;
+  }
+
+  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
+  ball.setCollisionManager(collisionManager);
+
+  sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");
+
+  $("#level").hide();
+  $("#readyScreen").hide();  // 다음 레벨 넘어갈 때 준비 화면 생략
+  $("#gameCanvas").show();
+  $("#game").show();
+  gameStarted = true;
+}
+
+function getNextLevel(current) {
+  if (current === "EASY") return "NORMAL"
+  if (current === "NORMAL") return "HARD"
+  return "EASY" // HARD 이후엔 EASY로 루프 or 변경 가능
+}
+
+Promise.all([
+  loadImage(ballImages.ball1),
+  loadImage(ballImages.ball2),
+  loadImage(ballImages.ball3),
+]).then(() => {
+  selectedBallImage = ballImages.ball1;
+  sound.playBGM("start");
+  draw();
+});
+
+
+// ===================== 게임 루프 ===================== //
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (backgroundImg) {
-    ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
-  }
+  if (backgroundImg) ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
 
   if (gameStarted) {
     if (!ball) {
       if (showGameOverImg && gameOverImg.complete) {
-        const x = (canvas.width - 300) / 2;
-        const y = (canvas.height - 150) / 2;
-        ctx.drawImage(gameOverImg, x, y, 300, 150);
+        ctx.drawImage(gameOverImg, (canvas.width - 300) / 2, (canvas.height - 150) / 2, 300, 150);
       }
-
       if (showVictoryImg && victoryImg.complete) {
-        const x = (canvas.width - 300) / 2;
-        const y = (canvas.height - 150) / 2;
-        ctx.drawImage(victoryImg, x, y, 300, 150);
+        ctx.drawImage(victoryImg, (canvas.width - 300) / 2, (canvas.height - 150) / 2, 300, 150);
       }
-
       requestAnimationFrame(draw);
       return;
     }
@@ -79,13 +124,13 @@ function draw() {
       lives.lose();
 
       if (!lives.isDead()) {
-        ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas);
+        ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
         ball.setCollisionManager(collisionManager);
       } else {
         showGameOverImg = true;
         ball = null;
         sound.playGameOver();
-        setTimeout(resetToStart, 3000);
+        setTimeout(() => resetToStart(true), 3000);
       }
     }
   }
@@ -93,81 +138,127 @@ function draw() {
   if (ball) ball.draw(ctx);
   paddle.draw(ctx);
 
-  for (const brick of bricks) {
+  bricks.forEach(brick => {
     brick.draw(ctx);
+
     if (brick.destroyed && !brick.counted) {
       score.addPoint();
       brick.counted = true;
 
-      // 아이템 생성 확률
-      if (Math.random() < 0.3) {
-        const types = [
-          "paddlebuff",
-          "paddledebuff",
-          "speedbuff",
-          "speeddebuff",
-        ];
+      if (Math.random() < 0.3 && level != "EASY") {
+        const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"];
         const type = types[Math.floor(Math.random() * types.length)];
-        items.push(
-          new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type)
-        );
+        items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type));
       }
     }
-  }
+  });
 
-  // 아이템 그리기 + Paddle 충돌 확인
-  for (const item of items) {
+  items.forEach(item => {
     if (!item.collected) {
       item.update();
       item.draw(ctx);
+
       if (paddle.checkCollisionWithItem(item)) {
         item.collect();
+        addItemToInventory(item.type);
 
-        // 아이템 효과 처리
-        if (item.type === "expand") paddle.enlarge();
-        else if (item.type === "shrink") paddle.shrink();
+        if (item.type === "paddlebuff") paddle.enlarge();
+        else if (item.type === "paddledebuff") paddle.shrink();
         else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2);
         else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8);
       }
     }
-  }
+  });
 
-  // 승리 체크
-  const allDestroyed = bricks.length > 0 && bricks.every((b) => b.destroyed);
+  const allDestroyed = bricks.length > 0 && bricks.every(b => b.destroyed);
   if (allDestroyed && !showVictoryImg) {
     showVictoryImg = true;
     sound.playVictory();
     ball = null;
-    setTimeout(resetToStart, 3000);
+    setTimeout(() => resetToStart(false), 3000);
   }
 
-  score.draw(ctx, canvas);
-
-  // ✅ 무조건 호출되어야 함 (루프 유지)
   requestAnimationFrame(draw);
 }
 
-function resetToStart() {
+
+// ===================== 상태 초기화 ===================== //
+function resetToStart(redirectToLobby = true) {
   showGameOverImg = false;
   showVictoryImg = false;
   backgroundImg = null;
   bricks = [];
   ball = null;
-  level = null;
   items.length = 0;
   gameStarted = false;
 
   collisionManager.reset();
   collisionManager.add(paddle);
 
-  showScreen("#startScreen");
-  $("#gameCanvas").hide();
-  sound.play("start");
+  $(".item img").remove();
+
+  if (redirectToLobby) {
+    // 패배 시: 로비로 이동
+    showScreen("#startScreen");
+    $("#gameCanvas").hide();
+    sound.playBGM("start");
+  } else {
+    // 승리 시: 다음 레벨 자동 진행
+    const nextLevel = getNextLevel(level);
+    startLevel(nextLevel);
+  }
 }
 
-$("#gameStart").click(function () {
+
+// ===================== 화면 전환 함수 ===================== //
+function showScreen(id) {
+  $(".screen").hide();
+  $(id).show();
+}
+
+
+// ===================== 아이템 인벤토리 추가 ===================== //
+function addItemToInventory(type) {
+  const slots = $("#itemContainer .item");
+  for (let i = 0; i < slots.length; i++) {
+    const slot = $(slots[i]);
+    if (slot.find("img").length > 0) continue;
+
+    const img = $("<img>")
+      .attr("src", `assets/${type}.png`)
+      .css({ width: "70px", height: "70px" });
+
+    slot.append(img);
+    break;
+  }
+}
+
+
+// ===================== 이벤트 바인딩 ===================== //
+showScreen("#startScreen");
+
+$("#levelTitle img").click(() => $("#settingOverlay").css("display", "flex"));
+$("#settingTitle img").click(() => $("#settingOverlay").css("display", "none"));
+
+$(".ballCheck").click(function () {
+  $(".ballCheck").css("background", "#B8CED4")
+    .find(".ballCheckBox").css("background", "#70757E").find("img").hide();
+
+  $(this).css("background", "#08C6FE")
+    .find(".ballCheckBox").css("background", "#3171D7").find("img").show();
+
+  const src = $(this).children("img").attr("src");
+  selectedBallImage =
+    src.includes("settingBall2") ? ballImages.ball2 :
+    src.includes("settingBall3") ? ballImages.ball3 :
+    ballImages.ball1;
+
+  if (ball) ball.changeImage(selectedBallImage);
+});
+
+$("#gameStart").click(() => {
   showScreen("#level");
-  sound.play("lobby");
+  sound.playBGM("lobby");
 });
 
 $(".levelButton").click(function () {
@@ -175,34 +266,27 @@ $(".levelButton").click(function () {
   $(this).addClass("selected");
 });
 
-$("#pass").click(function () {
+$("#pass").click(() => {
   $(".levelButton").removeClass("selected");
   showScreen("#startScreen");
-  sound.play("start");
+  sound.playBGM("start");
 });
 
-$("#levelselect").click(function () {
+$("#levelselect").click(() => {
   if ($(".levelButton.selected").length === 0) {
     alert("난이도를 선택하세요.");
     return;
   }
 
   const selectedBtn = $(".levelButton.selected img").attr("id");
-  level =
-    selectedBtn === "easygame"
-      ? "EASY"
-      : selectedBtn === "normalgame"
-      ? "NORMAL"
-      : "HARD";
+  level = selectedBtn === "easygame" ? "EASY" : selectedBtn === "normalgame" ? "NORMAL" : "HARD";
 
   levelManager.setLevel(level);
   lives.reset();
   score.reset(level);
 
   backgroundImg = new Image();
-  backgroundImg.src = `assets/map${
-    level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3
-  }.png`;
+  backgroundImg.src = `assets/map${level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3}.png`;
 
   bricks = BrickFactory.createBricks(level, canvas.width);
   for (const brick of bricks) {
@@ -210,19 +294,31 @@ $("#levelselect").click(function () {
     brick.counted = false;
   }
 
-  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas);
+  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
   ball.setCollisionManager(collisionManager);
 
-  sound.play(
-    level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3"
-  );
+  sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");
 
   $("#level").hide();
   $("#readyScreen").show();
-  $("#gameCanvas").show(); // 캔버스 보이기
+  $("#gameCanvas").show();
   $("#game").show();
   gameStarted = true;
 });
 
-sound.play("start");
-draw();
+$("#exit").click(() => resetToStart(true));
+
+$(".audioCheck").click(function () {
+  $(".audioCheckBox img").hide();
+  $(this).find("img").show();
+
+  const selected = $(this).find("span").text().trim();
+  if (selected === "ON") {
+    sound.bgmEnabled = true;
+    sound.playBGM("start");
+  } else {
+    sound.bgmEnabled = false;
+    sound.stopBGM();
+  }
+});

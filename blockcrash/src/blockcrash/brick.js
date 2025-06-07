@@ -13,6 +13,7 @@ class Brick extends ICollidable {
     this.destroyed = false
     this.hitCount = options.hitCount || 1
     this.image = options.image || null
+    this.indestructible = options.indestructible || false
   }
 
   checkCollision(ball) {
@@ -42,9 +43,12 @@ class Brick extends ICollidable {
     if (direction === "LEFT" || direction === "RIGHT") ball.bounceX()
     else ball.bounceY()
 
-    this.hitCount--
-    if (this.hitCount <= 0) this.destroyed = true
+    if (!this.indestructible) {
+      this.hitCount--
+      if (this.hitCount <= 0) this.destroyed = true
+    }
   }
+
 
   draw(ctx) {
     if (!this.destroyed) {

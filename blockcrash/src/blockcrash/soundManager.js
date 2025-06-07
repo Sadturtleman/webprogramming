@@ -1,6 +1,7 @@
 class SoundManager {
   constructor() {
-    this.current = null // 현재 재생 중인 오디오
+    this.currentBGM = null;
+    this.bgmEnabled = true; // ✅ 배경음 켜짐 상태
 
     this.tracks = {
       start: new Audio("assets/start.mp3"),
@@ -10,47 +11,67 @@ class SoundManager {
       game3: new Audio("assets/map3.mp3"),
       gameover: new Audio("assets/lose.mp3"),
       victory: new Audio("assets/win.mp3"),
-    }
+    };
 
-    // 루프 설정 (배경음들만)
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
-      this.tracks[key].loop = true
+      this.tracks[key].loop = true;
     }
   }
 
-  play(name) {
-    this.stop()
-    const track = this.tracks[name]
+  playBGM(name) {
+    this.stopBGM();
+    if (!this.bgmEnabled) return; // ✅ 끄기 상태면 재생 안 함
+    const track = this.tracks[name];
     if (track) {
-      track.currentTime = 0
-      track.play().catch((e) => {
-        console.warn("Autoplay error:", e)
-      })
-      this.current = track
+      track.currentTime = 0;
+      track.play().catch((e) => console.warn("Autoplay error:", e));
+      this.currentBGM = track;
     }
   }
 
-  stop() {
-    if (this.current) {
-      this.current.pause()
-      this.current.currentTime = 0
-      this.current = null
+  stopBGM() {
+    if (this.currentBGM) {
+      this.currentBGM.pause();
+      this.currentBGM.currentTime = 0;
+      this.currentBGM = null;
+    }
+  }
+
+  toggleBGM() {
+    this.bgmEnabled = !this.bgmEnabled;
+    if (!this.bgmEnabled) {
+      this.stopBGM();
     }
   }
 
   playGameOver() {
-    this.stop()
-    const sfx = this.tracks.gameover
-    sfx.currentTime = 0
-    sfx.play()
+    const sfx = this.tracks.gameover;
+    sfx.currentTime = 0;
+    sfx.play();
   }
 
   playVictory() {
-    this.stop()
-    const sfx = this.tracks.victory
-    sfx.currentTime = 0
-    sfx.play()
+    const sfx = this.tracks.victory;
+    sfx.currentTime = 0;
+    sfx.play();
   }
+
+  pauseBGM() {
+    if (this.current) {
+      this.current.pause();
+    }
+  }
+
+  resumeBGM() {
+    if (this.current) {
+      this.current.play().catch((e) => {
+        console.warn("resume error", e);
+      });
+    }
+  }
+
+
 }
+
 
 export default SoundManager
