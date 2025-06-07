@@ -17,8 +17,6 @@ class Ball {
         this.image = imgObj;
     }
 
-
-
     setCollisionManager(manager) {
         this.collisionManager = manager
     }
@@ -101,9 +99,6 @@ class Ball {
             ctx.closePath();
         }
     }
-
-
-
 }
 
 export default Ball
