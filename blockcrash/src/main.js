@@ -614,7 +614,8 @@ class SoundManager {
       gameover: new Audio("assets/lose.mp3"),
       victory: new Audio("assets/win.mp3"),
       clicked: new Audio("assets/button_click.mp3"),
-      crash: new Audio("assets/crashblock.mp3")
+      crash: new Audio("assets/crashblock.mp3"),
+      item: new Audio("assets/get_item.mp3")
     };
 
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
@@ -684,6 +685,13 @@ class SoundManager {
   playCrash() {
     if (!this.sfxEnabled) return;
     const sfx = this.tracks.crash;
+    sfx.currentTime = 0;
+    sfx.play();
+  }
+
+  playgetItem(){
+    if (!this.sfxEnabled) return;
+    const sfx = this.tracks.item;
     sfx.currentTime = 0;
     sfx.play();
   }
@@ -923,7 +931,7 @@ function draw() {
       if (paddle.checkCollisionWithItem(item)) {
         item.collect();
         addItemToInventory(item.type);
-
+        sound.playgetItem();
         if (item.type === "paddlebuff") paddle.enlarge();
         else if (item.type === "paddledebuff") paddle.shrink();
         else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2);
