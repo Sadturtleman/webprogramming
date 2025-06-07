@@ -56,6 +56,40 @@ function loadImage(img) {
   });
 }
 
+function startLevel(selectedLevel) {
+  level = selectedLevel;
+  levelManager.setLevel(level);
+  lives.reset();
+  score.reset(level);
+
+  backgroundImg = new Image();
+  backgroundImg.src = `assets/map${level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3}.png`;
+
+  bricks = BrickFactory.createBricks(level, canvas.width);
+  for (const brick of bricks) {
+    collisionManager.add(brick);
+    brick.counted = false;
+  }
+
+  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
+  ball.setCollisionManager(collisionManager);
+
+  sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");
+
+  $("#level").hide();
+  $("#readyScreen").hide();  // 다음 레벨 넘어갈 때 준비 화면 생략
+  $("#gameCanvas").show();
+  $("#game").show();
+  gameStarted = true;
+}
+
+function getNextLevel(current) {
+  if (current === "EASY") return "NORMAL"
+  if (current === "NORMAL") return "HARD"
+  return "EASY" // HARD 이후엔 EASY로 루프 or 변경 가능
+}
+
 Promise.all([
   loadImage(ballImages.ball1),
   loadImage(ballImages.ball2),
@@ -96,7 +130,7 @@ function draw() {
         showGameOverImg = true;
         ball = null;
         sound.playGameOver();
-        setTimeout(resetToStart, 3000);
+        setTimeout(() => resetToStart(true), 3000);
       }
     }
   }
@@ -141,7 +175,7 @@ function draw() {
     showVictoryImg = true;
     sound.playVictory();
     ball = null;
-    setTimeout(resetToStart, 3000);
+    setTimeout(() => resetToStart(false), 3000);
   }
 
   requestAnimationFrame(draw);
@@ -149,13 +183,12 @@ function draw() {
 
 
 // ===================== 상태 초기화 ===================== //
-function resetToStart() {
+function resetToStart(redirectToLobby = true) {
   showGameOverImg = false;
   showVictoryImg = false;
   backgroundImg = null;
   bricks = [];
   ball = null;
-  level = null;
   items.length = 0;
   gameStarted = false;
 
@@ -163,9 +196,17 @@ function resetToStart() {
   collisionManager.add(paddle);
 
   $(".item img").remove();
-  showScreen("#startScreen");
-  $("#gameCanvas").hide();
-  sound.playBGM("start");
+
+  if (redirectToLobby) {
+    // 패배 시: 로비로 이동
+    showScreen("#startScreen");
+    $("#gameCanvas").hide();
+    sound.playBGM("start");
+  } else {
+    // 승리 시: 다음 레벨 자동 진행
+    const nextLevel = getNextLevel(level);
+    startLevel(nextLevel);
+  }
 }
 
 
@@ -266,7 +307,7 @@ $("#levelselect").click(() => {
   gameStarted = true;
 });
 
-$("#exit").click(() => resetToStart());
+$("#exit").click(() => resetToStart(true));
 
 $(".audioCheck").click(function () {
   $(".audioCheckBox img").hide();
