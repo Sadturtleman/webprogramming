@@ -814,6 +814,10 @@ function loadImage(img) {
 }
 
 function startLevel(selectedLevel) {
+  if (selectedLevel === "LOBBY") {
+    resetToStart(true)
+    return
+  }
   level = selectedLevel;
   levelManager.setLevel(level);
   lives.reset();
@@ -844,6 +848,7 @@ function startLevel(selectedLevel) {
 function getNextLevel(current) {
   if (current === "EASY") return "NORMAL"
   if (current === "NORMAL") return "HARD"
+  if (current === "HARD") return "LOBBY"
   return "EASY" // HARD 이후엔 EASY로 루프 or 변경 가능
 }
 
