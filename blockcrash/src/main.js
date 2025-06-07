@@ -603,6 +603,7 @@ class SoundManager {
   constructor() {
     this.currentBGM = null;
     this.bgmEnabled = true;
+    this.sfxEnabled = true;
 
     this.tracks = {
       start: new Audio("assets/start.mp3"),
@@ -612,6 +613,8 @@ class SoundManager {
       game3: new Audio("assets/map3.mp3"),
       gameover: new Audio("assets/lose.mp3"),
       victory: new Audio("assets/win.mp3"),
+      clicked: new Audio("assets/button_click.mp3"),
+      crash: new Audio("assets/crashblock.mp3")
     };
 
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
@@ -670,6 +673,25 @@ class SoundManager {
       });
     }
   }
+
+  playClicked() {
+    if (!this.sfxEnabled) return;
+    const sfx = this.tracks.clicked;
+    sfx.currentTime = 0;
+    sfx.play();
+  }
+
+  playCrash() {
+    if (!this.sfxEnabled) return;
+    const sfx = this.tracks.crash;
+    sfx.currentTime = 0;
+    sfx.play();
+  }
+
+  toggleSFX() {
+    this.sfxEnabled = !this.sfxEnabled;
+  }
+
 }
 
 class BrickFactory {
@@ -879,7 +901,7 @@ function draw() {
     if (brick.destroyed && !brick.counted) {
       score.addPoint();
       brick.counted = true;
-
+      sound.playCrash()
       if (Math.random() < 0.3 && level != "EASY") {
         const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"];
         const type = types[Math.floor(Math.random() * types.length)];
@@ -993,17 +1015,20 @@ $(".ballCheck").click(function () {
 
 $("#gameStart").click(() => {
   showScreen("#level");
+  sound.playClicked();
   sound.playBGM("lobby");
 });
 
 $(".levelButton").click(function () {
   $(".levelButton").removeClass("selected");
   $(this).addClass("selected");
+  sound.playClicked();
 });
 
 $("#pass").click(() => {
   $(".levelButton").removeClass("selected");
   showScreen("#startScreen");
+  sound.playClicked();
   sound.playBGM("start");
 });
 
@@ -1040,9 +1065,14 @@ $("#levelselect").click(() => {
   $("#gameCanvas").show();
   $("#game").show();
   gameStarted = true;
+
+  sound.playClicked();
 });
 
-$("#exit").click(() => resetToStart(true));
+$("#exit").click(() => {
+  sound.playClicked();
+  resetToStart(true)
+});
 
 $(".audioCheck").click(function () {
   $(".audioCheckBox img").hide();
@@ -1056,4 +1086,6 @@ $(".audioCheck").click(function () {
     sound.bgmEnabled = false;
     sound.stopBGM();
   }
+
+  sound.playClicked();
 });
