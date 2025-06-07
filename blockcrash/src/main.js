@@ -25,9 +25,9 @@ const ballImages = {
   ball2: new Image(),
   ball3: new Image(),
 };
-ballImages.ball1.src = "assets/settingBall.png";
-ballImages.ball2.src = "assets/settingBall2.png";
-ballImages.ball3.src = "assets/settingBall3.png";
+ballImages.ball1.src = "assets/ball1.png";
+ballImages.ball2.src = "assets/ball2.png";
+ballImages.ball3.src = "assets/ball3.png";
 
 const gameOverImg = new Image();
 gameOverImg.src = "assets/loseImg.png";

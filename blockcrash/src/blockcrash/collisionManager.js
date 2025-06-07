@@ -8,11 +8,8 @@ class CollisionManager {
     }
 
     handle(ball) {
-        for (const obj of this.collidables) {
-            if (obj.checkCollision(ball)) {
-                obj.onCollision(ball)
-            }
-        }
+        const hit = this.collidables.find(obj => obj.checkCollision(ball))
+        if (hit) hit.onCollision(ball)
     }
     handleItem(item) {
     for (const obj of this.collidables) {

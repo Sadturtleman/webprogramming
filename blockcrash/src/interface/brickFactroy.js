@@ -17,13 +17,13 @@ class BrickFactory {
       case "NORMAL":
         rows = 5
         cols = 8
-        hitCount = 2
+        hitCount = 1
         image = brickImages.NORMAL
         break
       case "HARD":
         rows = 5
         cols = 8
-        hitCount = 3
+        hitCount = 1
         image = brickImages.HARD
         break
     }
@@ -37,11 +37,16 @@ class BrickFactory {
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
+
+        const isObstacle = difficulty === "HARD" && row === 4 && (col === 7 || col === 1)
+        const imageToUse = isObstacle ? brickImages.OBSTACLE : image
+
         const x = offsetLeft + col * (brickWidth + margin)
         const y = offsetTop + row * (brickHeight + margin)
         const brick = new Brick(x, y, brickWidth, brickHeight, {
-          hitCount,
-          image
+          hitCount : isObstacle ? Infinity : hitCount,
+          image : imageToUse,
+          indestructible : isObstacle
         })
         bricks.push(brick)
       }
