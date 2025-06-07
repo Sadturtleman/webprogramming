@@ -24,7 +24,11 @@ class Lives {
   isDead() {
     return this.life <= 0
   }
-
+  setlife(life){
+    this.life = life
+    this.render()
+  }
+  
   render() {
     if (!this.container) return
 

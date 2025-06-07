@@ -45,8 +45,6 @@ let gameStarted = false;
 let showGameOverImg = false;
 let showVictoryImg = false;
 
-paddle.lives = lives;
-paddle.score = score;
 collisionManager.add(paddle);
 
 
@@ -113,7 +111,7 @@ function draw() {
       score.addPoint();
       brick.counted = true;
 
-      if (Math.random() < 0.3) {
+      if (Math.random() < 0.3 && level != "EASY") {
         const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"];
         const type = types[Math.floor(Math.random() * types.length)];
         items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type));
@@ -256,6 +254,7 @@ $("#levelselect").click(() => {
   }
 
   ball = new Ball(canvas.width / 2, canvas.height / 2, 2, -2, canvas, selectedBallImage);
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
   ball.setCollisionManager(collisionManager);
 
   sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");

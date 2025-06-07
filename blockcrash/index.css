@@ -209,6 +209,15 @@ img {
   font-size: 35px;
   font-weight: 400;
 }
+
+#background1{
+  display: inline;
+}
+
+#background2{
+  display: none;
+}
+
 #settingBall {
   display: flex;
   flex-direction: column;
@@ -249,6 +258,15 @@ img {
   height: 50px;
   background: #70757e;
 }
+
+.ballCheckBox img {
+  display: none;
+}
+
+#ballChecks .ballCheck:first-child .ballCheckBox img {
+  display: block;
+}
+
 
 #lifeContainer {
   position: absolute;

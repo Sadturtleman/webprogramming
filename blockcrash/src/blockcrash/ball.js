@@ -1,8 +1,8 @@
 class Ball {
-    static RADIUS = 10
+    static RADIUS = 20
     static COLOR = "#DD3333"
 
-    constructor(x, y, dx = 10, dy = -10, canvas, imageObj) {
+    constructor(x, y, dx = 15, dy = -15, canvas, imageObj) {
         this.x = x;
         this.y = y;
         this.dx = dx;
