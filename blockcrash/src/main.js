@@ -1,185 +1,191 @@
 // ===================== 모듈 임포트 ===================== //
 
 class ICollidable {
-    checkCollision(ball) {
-        throw new Error("checkCollision not implemented")
-    }
+  checkCollision(ball) {
+    throw new Error("checkCollision not implemented");
+  }
 
-    onCollision(ball) {
-        throw new Error("onCollision not implemented")
-    }
+  onCollision(ball) {
+    throw new Error("onCollision not implemented");
+  }
 }
 
 const Direction = Object.freeze({
-    TOP: "TOP",
-    BOTTOM: "BOTTOM",
-    LEFT: "LEFT",
-    RIGHT: "RIGHT",
-})
+  TOP: "TOP",
+  BOTTOM: "BOTTOM",
+  LEFT: "LEFT",
+  RIGHT: "RIGHT",
+});
 
 class Ball {
-    static RADIUS = 40
-    static COLOR = "#DD3333"
+  static RADIUS = 40;
+  static COLOR = "#DD3333";
 
-    constructor(x, y, dx = 30, dy = -30, canvas, imageObj) {
-        this.x = x;
-        this.y = y;
-        this.dx = dx;
-        this.dy = dy;
-        this.canvas = canvas;
-        this.die = false;
-        this.collisionManager = null;
-        this.image = imageObj; // 이제 imageObj는 미리 로드된 Image 객체
+  constructor(x, y, dx = 30, dy = -30, canvas, imageObj) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.canvas = canvas;
+    this.die = false;
+    this.collisionManager = null;
+    this.image = imageObj; // 이제 imageObj는 미리 로드된 Image 객체
+  }
+
+  changeImage(imgObj) {
+    this.image = imgObj;
+  }
+
+  setCollisionManager(manager) {
+    this.collisionManager = manager;
+  }
+
+  move() {
+    if (this.die) return;
+
+    this.checkWallCollision();
+
+    if (this.collisionManager) {
+      this.collisionManager.handle(this);
     }
 
-    changeImage(imgObj) {
-        this.image = imgObj;
+    this.x += this.dx;
+    this.y += this.dy;
+  }
+
+  isDead() {
+    return this.die;
+  }
+
+  bounceX() {
+    this.dx = -this.dx;
+  }
+
+  bounceY() {
+    this.dy = -this.dy;
+  }
+
+  checkWallCollision() {
+    const { width, height } = this.canvas;
+
+    if (
+      this.x - Ball.RADIUS < 0 ||
+      this.x + Ball.RADIUS > width ||
+      this.y - Ball.RADIUS < 0 ||
+      this.y + Ball.RADIUS > height
+    ) {
+      this.die = true;
     }
+  }
+  adjustSpeed(factor) {
+    this.dx *= factor;
+    this.dy *= factor;
+  }
 
-    setCollisionManager(manager) {
-        this.collisionManager = manager
+  bounceWithAngle(offsetRatio, verticalDir = -1) {
+    const speed = Math.sqrt(this.dx ** 2 + this.dy ** 2);
+    const maxAngle = Math.PI / 3; // 최대 60도
+
+    const angle = offsetRatio * maxAngle;
+    this.dx = speed * Math.sin(angle);
+    this.dy = verticalDir * Math.abs(speed * Math.cos(angle)); // 위(-1) 또는 아래(+1)
+  }
+
+  draw(ctx) {
+    if (
+      this.image &&
+      this.image.complete &&
+      this.image.naturalWidth > 0 &&
+      this.image.naturalHeight > 0
+    ) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(
+        this.image,
+        this.x - Ball.RADIUS,
+        this.y - Ball.RADIUS,
+        Ball.RADIUS * 2,
+        Ball.RADIUS * 2
+      );
+      ctx.restore();
+    } else {
+      // fallback: 원형 색상 공
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
+      ctx.fillStyle = Ball.COLOR;
+      ctx.fill();
+      ctx.closePath();
     }
-
-    move() {
-        if (this.die) return
-
-        this.checkWallCollision()
-
-        if (this.collisionManager) {
-            this.collisionManager.handle(this)
-        }
-
-        this.x += this.dx
-        this.y += this.dy
-    }
-
-    isDead() {
-        return this.die
-    }
-
-    bounceX() {
-        this.dx = -this.dx
-    }
-
-    bounceY() {
-        this.dy = -this.dy
-    }
-
-    checkWallCollision() {
-        const { width, height } = this.canvas
-
-        if (
-            this.x - Ball.RADIUS < 0 || this.x + Ball.RADIUS > width ||
-            this.y - Ball.RADIUS < 0 || this.y + Ball.RADIUS > height
-        ) {
-            this.die = true
-        }
-    }
-    adjustSpeed(factor) {
-        this.dx *= factor
-        this.dy *= factor
-    }
-
-    bounceWithAngle(offsetRatio, verticalDir = -1) {
-        const speed = Math.sqrt(this.dx ** 2 + this.dy ** 2)
-        const maxAngle = Math.PI / 3  // 최대 60도
-
-        const angle = offsetRatio * maxAngle
-        this.dx = speed * Math.sin(angle)
-        this.dy = verticalDir * Math.abs(speed * Math.cos(angle))  // 위(-1) 또는 아래(+1)
-    }
-
-
-    draw(ctx) {
-        if (
-            this.image &&
-            this.image.complete &&
-            this.image.naturalWidth > 0 &&
-            this.image.naturalHeight > 0
-        ) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
-            ctx.clip();
-            ctx.drawImage(
-            this.image,
-            this.x - Ball.RADIUS,
-            this.y - Ball.RADIUS,
-            Ball.RADIUS * 2,
-            Ball.RADIUS * 2
-            );
-            ctx.restore();
-        } else {
-            // fallback: 원형 색상 공
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, Ball.RADIUS, 0, Math.PI * 2);
-            ctx.fillStyle = Ball.COLOR;
-            ctx.fill();
-            ctx.closePath();
-        }
-    }
+  }
 }
 
 class CollisionManager {
-    constructor() {
-        this.collidables = []
-    }
+  constructor() {
+    this.collidables = [];
+  }
 
-    add(obj) {
-        this.collidables.push(obj)
-    }
+  add(obj) {
+    this.collidables.push(obj);
+  }
 
-    handle(ball) {
-        const hit = this.collidables.find(obj => obj.checkCollision(ball))
-        if (hit) hit.onCollision(ball)
-    }
-    handleItem(item) {
+  handle(ball) {
+    const hit = this.collidables.find((obj) => obj.checkCollision(ball));
+    if (hit) hit.onCollision(ball);
+  }
+  handleItem(item) {
     for (const obj of this.collidables) {
-        if (obj.checkCollisionWithItem && obj.checkCollisionWithItem(item)) {
-            obj.onCollisionWithItem?.(item)
-        }
+      if (obj.checkCollisionWithItem && obj.checkCollisionWithItem(item)) {
+        obj.onCollisionWithItem?.(item);
+      }
     }
-    }
+  }
 
-    reset() {
-        this.collidables = []
-    }
+  reset() {
+    this.collidables = [];
+  }
 }
 
 class DirectionDetector {
-    static detect(ball, obj) {
-        const r = ball.constructor.RADIUS
+  static detect(ball, obj) {
+    const r = ball.constructor.RADIUS;
 
-        const overlapLeft = ball.x + r - obj.x
-        const overlapRight = obj.x + obj.width - (ball.x - r)
-        const overlapTop = ball.y + r - obj.y
-        const overlapBottom = obj.y + obj.height - (ball.y - r)
+    const overlapLeft = ball.x + r - obj.x;
+    const overlapRight = obj.x + obj.width - (ball.x - r);
+    const overlapTop = ball.y + r - obj.y;
+    const overlapBottom = obj.y + obj.height - (ball.y - r);
 
-        const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom)
+    const minOverlap = Math.min(
+      overlapLeft,
+      overlapRight,
+      overlapTop,
+      overlapBottom
+    );
 
-        if (minOverlap === overlapLeft) return "LEFT"
-        if (minOverlap === overlapRight) return "RIGHT"
-        if (minOverlap === overlapTop) return "TOP"
-        return "BOTTOM"
-    }
+    if (minOverlap === overlapLeft) return "LEFT";
+    if (minOverlap === overlapRight) return "RIGHT";
+    if (minOverlap === overlapTop) return "TOP";
+    return "BOTTOM";
+  }
 }
 
 class Item {
-  static SIZE = 80
+  static SIZE = 80;
 
   constructor(x, y, type) {
-    this.x = x
-    this.y = y
-    this.type = type     // 예: "life", "score", "expand", "shrink", "speedup", "slowdown"
-    this.collected = false
+    this.x = x;
+    this.y = y;
+    this.type = type; // 예: "life", "score", "expand", "shrink", "speedup", "slowdown"
+    this.collected = false;
 
-    this.image = new Image()
-    this.image.src = `assets/${type}.png`
+    this.image = new Image();
+    this.image.src = `assets/${type}.png`;
 
     // 에러 디버깅용
     this.image.onerror = () => {
-      console.warn(`⚠️ 아이템 이미지 로드 실패: ${this.type}`)
-    }
+      console.warn(`⚠️ 아이템 이미지 로드 실패: ${this.type}`);
+    };
   }
 
   getColor() {
@@ -189,110 +195,109 @@ class Item {
       expand: "blue",
       shrink: "purple",
       speedup: "orange",
-      slowdown: "green"
-    }
-    return colors[this.type] || "gray"
+      slowdown: "green",
+    };
+    return colors[this.type] || "gray";
   }
 
   draw(ctx) {
-    if (this.collected) return
+    if (this.collected) return;
 
-    const size = Item.SIZE
+    const size = Item.SIZE;
 
     if (this.image.complete && this.image.naturalWidth !== 0) {
-      ctx.drawImage(this.image, this.x, this.y, size, size)
+      ctx.drawImage(this.image, this.x, this.y, size, size);
     } else {
       // 이미지 로딩 실패 또는 대기 중일 때 기본 원형 표시
-      ctx.beginPath()
-      ctx.arc(this.x + size / 2, this.y + size / 2, size / 2, 0, Math.PI * 2)
-      ctx.fillStyle = this.getColor()
-      ctx.fill()
-      ctx.closePath()
+      ctx.beginPath();
+      ctx.arc(this.x + size / 2, this.y + size / 2, size / 2, 0, Math.PI * 2);
+      ctx.fillStyle = this.getColor();
+      ctx.fill();
+      ctx.closePath();
     }
   }
 
   update() {
     // 아래로 떨어지는 애니메이션
-    this.y += 2
+    this.y += 2;
   }
 
   checkCollision(paddle) {
-    const px = paddle.x
-    const py = paddle.y
-    const pw = paddle.width
-    const ph = paddle.height
+    const px = paddle.x;
+    const py = paddle.y;
+    const pw = paddle.width;
+    const ph = paddle.height;
 
-    const size = Item.SIZE
+    const size = Item.SIZE;
 
     return (
       this.x < px + pw &&
       this.x + size > px &&
       this.y < py + ph &&
       this.y + size > py
-    )
+    );
   }
 
   collect() {
-    this.collected = true
+    this.collected = true;
   }
 }
 
 class Brick extends ICollidable {
-  static COLOR = "#999"
+  static COLOR = "#999";
 
   constructor(x, y, width, height, options = {}) {
-    super()
-    this.x = x
-    this.y = y
-    this.width = width
-    this.height = height
-    this.destroyed = false
-    this.hitCount = options.hitCount || 1
-    this.image = options.image || null
-    this.indestructible = options.indestructible || false
+    super();
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.destroyed = false;
+    this.hitCount = options.hitCount || 1;
+    this.image = options.image || null;
+    this.indestructible = options.indestructible || false;
   }
 
   checkCollision(ball) {
-    if (this.destroyed) return false
+    if (this.destroyed) return false;
 
-    const r = ball.constructor.RADIUS
-    const ballLeft = ball.x - r
-    const ballRight = ball.x + r
-    const ballTop = ball.y - r
-    const ballBottom = ball.y + r
+    const r = ball.constructor.RADIUS;
+    const ballLeft = ball.x - r;
+    const ballRight = ball.x + r;
+    const ballTop = ball.y - r;
+    const ballBottom = ball.y + r;
 
-    const brickLeft = this.x
-    const brickRight = this.x + this.width
-    const brickTop = this.y
-    const brickBottom = this.y + this.height
+    const brickLeft = this.x;
+    const brickRight = this.x + this.width;
+    const brickTop = this.y;
+    const brickBottom = this.y + this.height;
 
     return (
       ballRight > brickLeft &&
       ballLeft < brickRight &&
       ballBottom > brickTop &&
       ballTop < brickBottom
-    )
+    );
   }
 
   onCollision(ball) {
-    const direction = DirectionDetector.detect(ball, this)
-    if (direction === "LEFT" || direction === "RIGHT") ball.bounceX()
-    else ball.bounceY()
+    const direction = DirectionDetector.detect(ball, this);
+    if (direction === "LEFT" || direction === "RIGHT") ball.bounceX();
+    else ball.bounceY();
 
     if (!this.indestructible) {
-      this.hitCount--
-      if (this.hitCount <= 0) this.destroyed = true
+      this.hitCount--;
+      if (this.hitCount <= 0) this.destroyed = true;
     }
   }
-
 
   draw(ctx) {
     if (!this.destroyed) {
       if (this.image && this.image.complete) {
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
       } else {
-        ctx.fillStyle = Brick.COLOR
-        ctx.fillRect(this.x, this.y, this.width, this.height)
+        ctx.fillStyle = Brick.COLOR;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
       }
     }
   }
@@ -300,302 +305,317 @@ class Brick extends ICollidable {
 
 class LevelManager {
   constructor() {
-    this.currentLevel = null
+    this.currentLevel = null;
   }
 
   setLevel(level) {
-    this.currentLevel = level
+    this.currentLevel = level;
   }
 
   getLevel() {
-    return this.currentLevel
+    return this.currentLevel;
   }
 }
 
-const levelManager = new LevelManager()
+const levelManager = new LevelManager();
 
 class Lives {
   constructor(max = 3) {
-    this.max = max
-    this.life = max
-    this.container = document.getElementById("heartContainer")
-    this.render()
+    this.max = max;
+    this.life = max;
+    this.container = document.getElementById("heartContainer");
+    this.render();
   }
 
   lose() {
-    this.life = Math.max(0, this.life - 1)
-    this.render()
+    this.life = Math.max(0, this.life - 1);
+    this.render();
   }
 
   gain() {
-    this.life = Math.min(this.life + 1, this.max)
-    this.render()
+    this.life = Math.min(this.life + 1, this.max);
+    this.render();
   }
 
   reset() {
-    this.life = this.max
-    this.render()
+    this.life = this.max;
+    this.render();
   }
 
   isDead() {
-    return this.life <= 0
+    return this.life <= 0;
   }
-  setlife(life){
-    this.life = life
-    this.render()
+  setlife(life) {
+    this.life = life;
+    this.render();
   }
-  
-  render() {
-    if (!this.container) return
 
-    this.container.innerHTML = ""
+  render() {
+    if (!this.container) return;
+
+    this.container.innerHTML = "";
 
     for (let i = 0; i < this.life; i++) {
-      const heart = document.createElement("img")
-      heart.src = "assets/heart.png"
-      heart.className = "life"
-      this.container.appendChild(heart)
+      const heart = document.createElement("img");
+      heart.src = "assets/heart.png";
+      heart.className = "life";
+      this.container.appendChild(heart);
     }
   }
 }
 
-
 class Paddle extends ICollidable {
-    static DEFAULT_WIDTH = 150
-    static DEFAULT_HEIGHT = 60
-    static COLOR = "#0095DD"
-    static MARGIN = 10
-    static #instance = null
+  static DEFAULT_WIDTH = 150;
+  static DEFAULT_HEIGHT = 60;
+  static COLOR = "#0095DD";
+  static MARGIN = 10;
+  static #instance = null;
 
-    static IMAGE_PATHS = {
-        [Direction.TOP]: "assets/paddleboard1.png",
-        [Direction.BOTTOM]: "assets/paddleboard2.png",
-        [Direction.LEFT]: "assets/paddleboard4.png",
-        [Direction.RIGHT]: "assets/paddleboard3.png",
+  static IMAGE_PATHS = {
+    [Direction.TOP]: "assets/paddleboard1.png",
+    [Direction.BOTTOM]: "assets/paddleboard2.png",
+    [Direction.LEFT]: "assets/paddleboard4.png",
+    [Direction.RIGHT]: "assets/paddleboard3.png",
+  };
+
+  static IMAGES = {};
+
+  // ✅ 모든 방향 이미지 미리 로딩
+  static loadMainImage() {
+    for (const direction of Object.values(Direction)) {
+      if (!Paddle.IMAGES[direction]) {
+        Paddle.loadImageForDirection(direction);
+      }
     }
+  }
 
-    static IMAGES = {}
+  static loadImageForDirection(direction) {
+    const path = Paddle.IMAGE_PATHS[direction];
+    const img = new Image();
+    img.src = path;
+    Paddle.IMAGES[direction] = img;
+  }
 
-    // ✅ 모든 방향 이미지 미리 로딩
-    static loadMainImage() {
-        for (const direction of Object.values(Direction)) {
-            if (!Paddle.IMAGES[direction]) {
-                Paddle.loadImageForDirection(direction)
-            }
+  constructor(canvas) {
+    super();
+    if (Paddle.#instance) throw new Error("Paddle is Singleton");
+
+    this.canvas = canvas;
+    this.x = 0;
+    this.y = 0;
+    this.width = Paddle.DEFAULT_WIDTH;
+    this.height = Paddle.DEFAULT_HEIGHT;
+    this.direction = Direction.BOTTOM;
+
+    this.bindMouseMove();
+    Paddle.#instance = this;
+  }
+
+  static getInstance(canvas) {
+    return Paddle.#instance || new Paddle(canvas);
+  }
+
+  bindMouseMove() {
+    $(this.canvas).on("mousemove", (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const distances = new Map([
+        [Direction.TOP, mouseY],
+        [Direction.BOTTOM, this.canvas.height - mouseY],
+        [Direction.LEFT, mouseX],
+        [Direction.RIGHT, this.canvas.width - mouseX],
+      ]);
+
+      let nearestDirection = null;
+      let minDistance = Infinity;
+
+      for (const [dir, dist] of distances) {
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestDirection = dir;
         }
+      }
+
+      this.setPosition(nearestDirection, mouseX, mouseY);
+      this.clamp();
+    });
+  }
+
+  setPosition(direction, mouseX, mouseY) {
+    this.direction = direction;
+
+    const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle;
+
+    if (direction === Direction.TOP) {
+      this.width = DEFAULT_WIDTH;
+      this.height = DEFAULT_HEIGHT;
+      this.y = MARGIN;
+      this.x = mouseX - this.width / 2;
+    } else if (direction === Direction.BOTTOM) {
+      this.width = DEFAULT_WIDTH;
+      this.height = DEFAULT_HEIGHT;
+      this.y = this.canvas.height - this.height - MARGIN;
+      this.x = mouseX - this.width / 2;
+    } else if (direction === Direction.LEFT) {
+      this.width = DEFAULT_HEIGHT;
+      this.height = DEFAULT_WIDTH;
+      this.x = MARGIN;
+      this.y = mouseY - this.height / 2;
+    } else if (direction === Direction.RIGHT) {
+      this.width = DEFAULT_HEIGHT;
+      this.height = DEFAULT_WIDTH;
+      this.x = this.canvas.width - this.width - MARGIN;
+      this.y = mouseY - this.height / 2;
     }
 
-    static loadImageForDirection(direction) {
-        const path = Paddle.IMAGE_PATHS[direction]
-        const img = new Image()
-        img.src = path
-        Paddle.IMAGES[direction] = img
+    // 보장용: 해당 방향 이미지가 없으면 로드
+    if (!Paddle.IMAGES[direction]) {
+      Paddle.loadImageForDirection(direction);
     }
+  }
 
-    constructor(canvas) {
-        super()
-        if (Paddle.#instance) throw new Error("Paddle is Singleton")
+  clamp() {
+    this.x = Math.max(0, Math.min(this.x, this.canvas.width - this.width));
+    this.y = Math.max(0, Math.min(this.y, this.canvas.height - this.height));
+  }
 
-        this.canvas = canvas
-        this.x = 0
-        this.y = 0
-        this.width = Paddle.DEFAULT_WIDTH
-        this.height = Paddle.DEFAULT_HEIGHT
-        this.direction = Direction.BOTTOM
+  checkCollision(ball) {
+    const r = ball.constructor.RADIUS;
+    const { x, y, width, height } = this;
 
-        this.bindMouseMove()
-        Paddle.#instance = this
-    }
-
-    static getInstance(canvas) {
-        return Paddle.#instance || new Paddle(canvas)
-    }
-
-    bindMouseMove() {
-        $(this.canvas).on("mousemove", (e) => {
-            const rect = this.canvas.getBoundingClientRect()
-            const mouseX = e.clientX - rect.left
-            const mouseY = e.clientY - rect.top
-
-            const distances = new Map([
-                [Direction.TOP, mouseY],
-                [Direction.BOTTOM, this.canvas.height - mouseY],
-                [Direction.LEFT, mouseX],
-                [Direction.RIGHT, this.canvas.width - mouseX],
-            ])
-
-            let nearestDirection = null
-            let minDistance = Infinity
-
-            for (const [dir, dist] of distances) {
-                if (dist < minDistance) {
-                    minDistance = dist
-                    nearestDirection = dir
-                }
-            }
-
-            this.setPosition(nearestDirection, mouseX, mouseY)
-            this.clamp()
-        })
-    }
-
-    setPosition(direction, mouseX, mouseY) {
-        this.direction = direction
-
-        const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle
-
-        if (direction === Direction.TOP) {
-            this.width = DEFAULT_WIDTH
-            this.height = DEFAULT_HEIGHT
-            this.y = MARGIN
-            this.x = mouseX - this.width / 2
-        } else if (direction === Direction.BOTTOM) {
-            this.width = DEFAULT_WIDTH
-            this.height = DEFAULT_HEIGHT
-            this.y = this.canvas.height - this.height - MARGIN
-            this.x = mouseX - this.width / 2
-        } else if (direction === Direction.LEFT) {
-            this.width = DEFAULT_HEIGHT
-            this.height = DEFAULT_WIDTH
-            this.x = MARGIN
-            this.y = mouseY - this.height / 2
-        } else if (direction === Direction.RIGHT) {
-            this.width = DEFAULT_HEIGHT
-            this.height = DEFAULT_WIDTH
-            this.x = this.canvas.width - this.width - MARGIN
-            this.y = mouseY - this.height / 2
-        }
-
-        // 보장용: 해당 방향 이미지가 없으면 로드
-        if (!Paddle.IMAGES[direction]) {
-            Paddle.loadImageForDirection(direction)
-        }
-    }
-
-    clamp() {
-        this.x = Math.max(0, Math.min(this.x, this.canvas.width - this.width))
-        this.y = Math.max(0, Math.min(this.y, this.canvas.height - this.height))
-    }
-
-    checkCollision(ball) {
-        const r = ball.constructor.RADIUS
-        const { x, y, width, height } = this
-
-        switch (this.direction) {
-            case Direction.TOP:
-                return ball.y - r <= y + height && ball.y >= y && ball.x >= x && ball.x <= x + width
-            case Direction.BOTTOM:
-                return ball.y + r >= y && ball.y <= y + height && ball.x >= x && ball.x <= x + width
-            case Direction.LEFT:
-                return ball.x - r <= x + width && ball.x >= x && ball.y >= y && ball.y <= y + height
-            case Direction.RIGHT:
-                return ball.x + r >= x && ball.x <= x + width && ball.y >= y && ball.y <= y + height
-        }
-    }
-    checkCollisionWithItem(item) {
-        const size = Item.SIZE
+    switch (this.direction) {
+      case Direction.TOP:
         return (
-            this.x < item.x + size &&
-            this.x + this.width > item.x &&
-            this.y < item.y + size &&
-            this.y + this.height > item.y
-        )
+          ball.y - r <= y + height &&
+          ball.y >= y &&
+          ball.x >= x &&
+          ball.x <= x + width
+        );
+      case Direction.BOTTOM:
+        return (
+          ball.y + r >= y &&
+          ball.y <= y + height &&
+          ball.x >= x &&
+          ball.x <= x + width
+        );
+      case Direction.LEFT:
+        return (
+          ball.x - r <= x + width &&
+          ball.x >= x &&
+          ball.y >= y &&
+          ball.y <= y + height
+        );
+      case Direction.RIGHT:
+        return (
+          ball.x + r >= x &&
+          ball.x <= x + width &&
+          ball.y >= y &&
+          ball.y <= y + height
+        );
     }
+  }
+  checkCollisionWithItem(item) {
+    const size = Item.SIZE;
+    return (
+      this.x < item.x + size &&
+      this.x + this.width > item.x &&
+      this.y < item.y + size &&
+      this.y + this.height > item.y
+    );
+  }
 
-    onCollision(ball) {
-        if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
-            const relativeX = ball.x - this.x
-            const offsetRatio = (relativeX / this.width - 0.5) * 2  // -1(left) ~ 1(right)
-            const verticalDir = this.direction === Direction.TOP ? 1 : -1
+  onCollision(ball) {
+    if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
+      const relativeX = ball.x - this.x;
+      const offsetRatio = (relativeX / this.width - 0.5) * 2; // -1(left) ~ 1(right)
+      const verticalDir = this.direction === Direction.TOP ? 1 : -1;
 
-            ball.bounceWithAngle(offsetRatio, verticalDir)
+      ball.bounceWithAngle(offsetRatio, verticalDir);
 
-            // 🎯 위치 보정
-            if (this.direction == Direction.TOP) {
-                ball.y = this.y + this.height + ball.constructor.RADIUS
-            } else {
-                ball.y = this.y - ball.constructor.RADIUS
-            }
+      // 🎯 위치 보정
+      if (this.direction == Direction.TOP) {
+        ball.y = this.y + this.height + ball.constructor.RADIUS;
+      } else {
+        ball.y = this.y - ball.constructor.RADIUS;
+      }
+    } else {
+      ball.bounceX();
 
-        } else {
-            ball.bounceX()
-
-            // 🎯 위치 보정 (좌우 패들일 경우)
-            if (this.direction == Direction.LEFT) {
-                ball.x = this.x + this.width + ball.constructor.RADIUS
-            } else {
-                ball.x = this.x - ball.constructor.RADIUS
-            }
-        }
+      // 🎯 위치 보정 (좌우 패들일 경우)
+      if (this.direction == Direction.LEFT) {
+        ball.x = this.x + this.width + ball.constructor.RADIUS;
+      } else {
+        ball.x = this.x - ball.constructor.RADIUS;
+      }
     }
+  }
 
-
-
-    draw(ctx) {
-        const image = Paddle.IMAGES[this.direction]
-        if (image && image.complete) {
-            ctx.drawImage(image, this.x, this.y, this.width, this.height)
-        } else {
-            ctx.beginPath()
-            ctx.rect(this.x, this.y, this.width, this.height)
-            ctx.fillStyle = Paddle.COLOR
-            ctx.fill()
-            ctx.closePath()
-        }
+  draw(ctx) {
+    const image = Paddle.IMAGES[this.direction];
+    if (image && image.complete) {
+      ctx.drawImage(image, this.x, this.y, this.width, this.height);
+    } else {
+      ctx.beginPath();
+      ctx.rect(this.x, this.y, this.width, this.height);
+      ctx.fillStyle = Paddle.COLOR;
+      ctx.fill();
+      ctx.closePath();
     }
+  }
 
-    enlarge() {
-        this.width *= 1.5
-        this.height *= 1.5
+  enlarge() {
+    this.width *= 1.5;
+    this.height *= 1.5;
 
-        // 일정 시간 후 원래 크기로 복구
-        setTimeout(() => {
-            this.width = Paddle.DEFAULT_WIDTH
-            this.height = Paddle.DEFAULT_HEIGHT
-        }, 5000)
-    }
+    // 일정 시간 후 원래 크기로 복구
+    setTimeout(() => {
+      this.width = Paddle.DEFAULT_WIDTH;
+      this.height = Paddle.DEFAULT_HEIGHT;
+    }, 5000);
+  }
 
-    shrink() {
-        this.width *= 0.7
-        this.height *= 0.7
+  shrink() {
+    this.width *= 0.7;
+    this.height *= 0.7;
 
-        // 5초 후 원래 크기로 복원
-        setTimeout(() => {
-            this.width = Paddle.DEFAULT_WIDTH
-            this.height = Paddle.DEFAULT_HEIGHT
-        }, 5000)
-    }
-
+    // 5초 후 원래 크기로 복원
+    setTimeout(() => {
+      this.width = Paddle.DEFAULT_WIDTH;
+      this.height = Paddle.DEFAULT_HEIGHT;
+    }, 5000);
+  }
 }
 
 class Score {
   constructor() {
-    this.score = 0
-    this.pointPerBrick = 10
-    this.container = document.getElementById("timeText")
-    this.render()
+    this.score = 0;
+    this.pointPerBrick = 10;
+    this.container = document.getElementById("timeText");
+    this.render();
   }
 
   reset(level) {
-    this.score = 0
-    if (level === "EASY") this.pointPerBrick = 10
-    else if (level === "NORMAL") this.pointPerBrick = 20
-    else if (level === "HARD") this.pointPerBrick = 30
-    this.render()
+    this.score = 0;
+    if (level === "EASY") this.pointPerBrick = 10;
+    else if (level === "NORMAL") this.pointPerBrick = 20;
+    else if (level === "HARD") this.pointPerBrick = 30;
+    this.render();
   }
 
   addPoint() {
-    this.score += this.pointPerBrick
-    this.render()
+    this.score += this.pointPerBrick;
+    this.render();
   }
 
   get() {
-    return this.score
+    return this.score;
   }
 
-  render(){
+  render() {
     if (!this.container) return;
-    this.container.innerText = `점수 : ${this.score}`
+    this.container.innerText = `점수 : ${this.score}`;
   }
 }
 
@@ -615,7 +635,7 @@ class SoundManager {
       victory: new Audio("assets/win.mp3"),
       clicked: new Audio("assets/button_click.mp3"),
       crash: new Audio("assets/crashblock.mp3"),
-      item: new Audio("assets/get_item.mp3")
+      item: new Audio("assets/get_item.mp3"),
     };
 
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
@@ -689,7 +709,7 @@ class SoundManager {
     sfx.play();
   }
 
-  playgetItem(){
+  playgetItem() {
     if (!this.sfxEnabled) return;
     const sfx = this.tracks.item;
     sfx.currentTime = 0;
@@ -699,43 +719,48 @@ class SoundManager {
   toggleSFX() {
     this.sfxEnabled = !this.sfxEnabled;
   }
-
 }
 
 class BrickFactory {
   static createBricks(difficulty, canvasWidth) {
-    const bricks = []
+    const bricks = [];
 
-    let rows, cols, hitCount, image
+    let rows, cols, hitCount, image;
 
     switch (difficulty) {
       case "EASY":
-        rows = 5
-        cols = 8
-        hitCount = 1
-        image = brickImages.EASY
-        break
+        rows = 5;
+        cols = 8;
+        hitCount = 1;
+        image = brickImages.EASY;
+        break;
       case "NORMAL":
-        rows = 5
-        cols = 8
-        hitCount = 1
-        image = brickImages.NORMAL
-        break
+        rows = 5;
+        cols = 8;
+        hitCount = 1;
+        image = brickImages.NORMAL;
+        break;
       case "HARD":
-        rows = 5
-        cols = 8
-        hitCount = 1
-        image = brickImages.HARD
-        break
+        rows = 5;
+        cols = 8;
+        hitCount = 1;
+        image = brickImages.HARD;
+        break;
     }
 
-    const brickWidth = 80
-    const brickHeight = 80
-    const margin = 5
-    const offsetTop = 50
-    const totalWidth = cols * (brickWidth + margin) - margin
-    const offsetLeft = (canvasWidth - totalWidth) / 2
-    const indestructiblepos = [[0, 2], [0, 7], [1, 4], [3, 1], [3, 5]];
+    const brickWidth = 80;
+    const brickHeight = 80;
+    const margin = 5;
+    const offsetTop = 50;
+    const totalWidth = cols * (brickWidth + margin) - margin;
+    const offsetLeft = (canvasWidth - totalWidth) / 2;
+    const indestructiblepos = [
+      [0, 2],
+      [0, 7],
+      [1, 4],
+      [3, 1],
+      [3, 5],
+    ];
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -758,22 +783,21 @@ class BrickFactory {
       }
     }
 
-    return bricks
+    return bricks;
   }
 }
-
 
 const brickImages = {
   EASY: new Image(),
   NORMAL: new Image(),
   HARD: new Image(),
-  OBSTACLE : new Image()
-}
+  OBSTACLE: new Image(),
+};
 
-brickImages.EASY.src = "assets/map1_box1.png"
-brickImages.NORMAL.src = "assets/map3_box1.png"
-brickImages.HARD.src = "assets/map2_box1.png"
-brickImages.OBSTACLE.src = "assets/map3_box3.png"
+brickImages.EASY.src = "assets/map1_box1.png";
+brickImages.NORMAL.src = "assets/map3_box1.png";
+brickImages.HARD.src = "assets/map2_box1.png";
+brickImages.OBSTACLE.src = "assets/map3_box3.png";
 
 // ===================== 전역 상수 및 변수 ===================== //
 const canvas = $("#gameCanvas")[0];
@@ -812,7 +836,6 @@ let showVictoryImg = false;
 
 collisionManager.add(paddle);
 
-
 // ===================== 이미지 로딩 및 초기 시작 ===================== //
 function loadImage(img) {
   return new Promise((resolve, reject) => {
@@ -823,8 +846,8 @@ function loadImage(img) {
 
 function startLevel(selectedLevel) {
   if (selectedLevel === "LOBBY") {
-    resetToStart(true)
-    return
+    resetToStart(true);
+    return;
   }
   level = selectedLevel;
   levelManager.setLevel(level);
@@ -832,7 +855,9 @@ function startLevel(selectedLevel) {
   score.reset(level);
 
   backgroundImg = new Image();
-  backgroundImg.src = `assets/map${level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3}.png`;
+  backgroundImg.src = `assets/map${
+    level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3
+  }.png`;
 
   bricks = BrickFactory.createBricks(level, canvas.width);
   for (const brick of bricks) {
@@ -840,24 +865,33 @@ function startLevel(selectedLevel) {
     brick.counted = false;
   }
 
-  ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
-  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
+  ball = new Ball(
+    canvas.width / 2,
+    canvas.height / 2 + 150,
+    2,
+    -2,
+    canvas,
+    selectedBallImage
+  );
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3);
   ball.setCollisionManager(collisionManager);
 
-  sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");
+  sound.playBGM(
+    level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3"
+  );
 
   $("#level").hide();
-  $("#readyScreen").hide();  // 다음 레벨 넘어갈 때 준비 화면 생략
+  $("#readyScreen").hide(); // 다음 레벨 넘어갈 때 준비 화면 생략
   $("#gameCanvas").show();
   $("#game").show();
   gameStarted = true;
 }
 
 function getNextLevel(current) {
-  if (current === "EASY") return "NORMAL"
-  if (current === "NORMAL") return "HARD"
-  if (current === "HARD") return "LOBBY"
-  return "EASY" // HARD 이후엔 EASY로 루프 or 변경 가능
+  if (current === "EASY") return "NORMAL";
+  if (current === "NORMAL") return "HARD";
+  if (current === "HARD") return "LOBBY";
+  return "EASY"; // HARD 이후엔 EASY로 루프 or 변경 가능
 }
 
 Promise.all([
@@ -870,19 +904,31 @@ Promise.all([
   draw();
 });
 
-
 // ===================== 게임 루프 ===================== //
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (backgroundImg) ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+  if (backgroundImg)
+    ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
 
   if (gameStarted) {
     if (!ball) {
       if (showGameOverImg && gameOverImg.complete) {
-        ctx.drawImage(gameOverImg, (canvas.width - 300) / 2, (canvas.height - 150) / 2, 300, 150);
+        ctx.drawImage(
+          gameOverImg,
+          (canvas.width - 300) / 2,
+          (canvas.height - 150) / 2,
+          300,
+          150
+        );
       }
       if (showVictoryImg && victoryImg.complete) {
-        ctx.drawImage(victoryImg, (canvas.width - 300) / 2, (canvas.height - 150) / 2, 300, 150);
+        ctx.drawImage(
+          victoryImg,
+          (canvas.width - 300) / 2,
+          (canvas.height - 150) / 2,
+          300,
+          150
+        );
       }
       requestAnimationFrame(draw);
       return;
@@ -894,7 +940,14 @@ function draw() {
       lives.lose();
 
       if (!lives.isDead()) {
-        ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
+        ball = new Ball(
+          canvas.width / 2,
+          canvas.height / 2 + 150,
+          2,
+          -2,
+          canvas,
+          selectedBallImage
+        );
         ball.setCollisionManager(collisionManager);
       } else {
         showGameOverImg = true;
@@ -908,22 +961,29 @@ function draw() {
   if (ball) ball.draw(ctx);
   paddle.draw(ctx);
 
-  bricks.forEach(brick => {
+  bricks.forEach((brick) => {
     brick.draw(ctx);
 
     if (brick.destroyed && !brick.counted) {
       score.addPoint();
       brick.counted = true;
-      sound.playCrash()
+      sound.playCrash();
       if (Math.random() < 0.3 && level != "EASY") {
-        const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"];
+        const types = [
+          "paddlebuff",
+          "paddledebuff",
+          "speedbuff",
+          "speeddebuff",
+        ];
         const type = types[Math.floor(Math.random() * types.length)];
-        items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type));
+        items.push(
+          new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type)
+        );
       }
     }
   });
 
-  items.forEach(item => {
+  items.forEach((item) => {
     if (!item.collected) {
       item.update();
       item.draw(ctx);
@@ -940,7 +1000,7 @@ function draw() {
     }
   });
 
-  const allDestroyed = bricks.length > 0 && bricks.every(b => b.destroyed);
+  const allDestroyed = bricks.length > 0 && bricks.every((b) => b.destroyed);
   if (allDestroyed && !showVictoryImg) {
     showVictoryImg = true;
     sound.playVictory();
@@ -950,7 +1010,6 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
-
 
 // ===================== 상태 초기화 ===================== //
 function resetToStart(redirectToLobby = true) {
@@ -979,13 +1038,11 @@ function resetToStart(redirectToLobby = true) {
   }
 }
 
-
 // ===================== 화면 전환 함수 ===================== //
 function showScreen(id) {
   $(".screen").hide();
   $(id).show();
 }
-
 
 // ===================== 아이템 인벤토리 추가 ===================== //
 function addItemToInventory(type) {
@@ -1003,7 +1060,6 @@ function addItemToInventory(type) {
   }
 }
 
-
 // ===================== 이벤트 바인딩 ===================== //
 showScreen("#startScreen");
 
@@ -1011,17 +1067,26 @@ $("#levelTitle img").click(() => $("#settingOverlay").css("display", "flex"));
 $("#settingTitle img").click(() => $("#settingOverlay").css("display", "none"));
 
 $(".ballCheck").click(function () {
-  $(".ballCheck").css("background", "#B8CED4")
-    .find(".ballCheckBox").css("background", "#70757E").find("img").hide();
+  $(".ballCheck")
+    .css("background", "#B8CED4")
+    .find(".ballCheckBox")
+    .css("background", "#70757E")
+    .find("img")
+    .hide();
 
-  $(this).css("background", "#08C6FE")
-    .find(".ballCheckBox").css("background", "#3171D7").find("img").show();
+  $(this)
+    .css("background", "#08C6FE")
+    .find(".ballCheckBox")
+    .css("background", "#3171D7")
+    .find("img")
+    .show();
 
   const src = $(this).children("img").attr("src");
-  selectedBallImage =
-    src.includes("settingBall2") ? ballImages.ball2 :
-    src.includes("settingBall3") ? ballImages.ball3 :
-    ballImages.ball1;
+  selectedBallImage = src.includes("settingBall2")
+    ? ballImages.ball2
+    : src.includes("settingBall3")
+    ? ballImages.ball3
+    : ballImages.ball1;
 
   if (ball) ball.changeImage(selectedBallImage);
 });
@@ -1030,6 +1095,25 @@ $("#gameStart").click(() => {
   showScreen("#level");
   sound.playClicked();
   sound.playBGM("lobby");
+});
+
+$("#gameDesc").click(function () {
+  showScreen("#desc");
+  $("#desc img").hide();
+  $("#desc img").first().show();
+});
+
+$("#desc img").click(function () {
+  const nextImg = $(this).next("img");
+  sound.playClicked();
+  $(this).hide();
+
+  if (nextImg.length) {
+    nextImg.show();
+  } else {
+    $("#desc").hide();
+    $("#startScreen").show();
+  }
 });
 
 $(".levelButton").click(function () {
@@ -1052,14 +1136,21 @@ $("#levelselect").click(() => {
   }
 
   const selectedBtn = $(".levelButton.selected img").attr("id");
-  level = selectedBtn === "easygame" ? "EASY" : selectedBtn === "normalgame" ? "NORMAL" : "HARD";
+  level =
+    selectedBtn === "easygame"
+      ? "EASY"
+      : selectedBtn === "normalgame"
+      ? "NORMAL"
+      : "HARD";
 
   levelManager.setLevel(level);
   lives.reset();
   score.reset(level);
 
   backgroundImg = new Image();
-  backgroundImg.src = `assets/map${level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3}.png`;
+  backgroundImg.src = `assets/map${
+    level === "EASY" ? 1 : level === "NORMAL" ? 2 : 3
+  }.png`;
 
   bricks = BrickFactory.createBricks(level, canvas.width);
   for (const brick of bricks) {
@@ -1067,11 +1158,20 @@ $("#levelselect").click(() => {
     brick.counted = false;
   }
 
-  ball = new Ball(canvas.width / 2, canvas.height / 2 + 150, 2, -2, canvas, selectedBallImage);
-  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3)
+  ball = new Ball(
+    canvas.width / 2,
+    canvas.height / 2 + 150,
+    2,
+    -2,
+    canvas,
+    selectedBallImage
+  );
+  lives.setlife(level == "EASY" ? 5 : level == "NORMAL" ? 4 : 3);
   ball.setCollisionManager(collisionManager);
 
-  sound.playBGM(level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3");
+  sound.playBGM(
+    level === "EASY" ? "game1" : level === "NORMAL" ? "game2" : "game3"
+  );
 
   $("#level").hide();
   $("#readyScreen").show();
@@ -1084,7 +1184,7 @@ $("#levelselect").click(() => {
 
 $("#exit").click(() => {
   sound.playClicked();
-  resetToStart(true)
+  resetToStart(true);
 });
 
 $(".audioCheck").click(function () {
