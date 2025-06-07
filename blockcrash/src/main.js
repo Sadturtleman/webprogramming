@@ -635,10 +635,7 @@ class SoundManager {
       victory: new Audio("assets/win.mp3"),
       clicked: new Audio("assets/button_click.mp3"),
       crash: new Audio("assets/crashblock.mp3"),
-<<<<<<< HEAD
       item: new Audio("assets/get_item.mp3"),
-=======
->>>>>>> 98c0424fd10f44537635392a7c2f4ae0230a12a7
     };
 
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
@@ -893,10 +890,7 @@ function startLevel(selectedLevel) {
 function getNextLevel(current) {
   if (current === "EASY") return "NORMAL";
   if (current === "NORMAL") return "HARD";
-<<<<<<< HEAD
   if (current === "HARD") return "LOBBY";
-=======
->>>>>>> 98c0424fd10f44537635392a7c2f4ae0230a12a7
   return "EASY"; // HARD 이후엔 EASY로 루프 or 변경 가능
 }
 
@@ -1111,11 +1105,7 @@ $("#gameDesc").click(function () {
 
 $("#desc img").click(function () {
   const nextImg = $(this).next("img");
-<<<<<<< HEAD
   sound.playClicked();
-=======
-
->>>>>>> 98c0424fd10f44537635392a7c2f4ae0230a12a7
   $(this).hide();
 
   if (nextImg.length) {
