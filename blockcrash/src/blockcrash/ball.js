@@ -2,7 +2,7 @@ class Ball {
     static RADIUS = 40
     static COLOR = "#DD3333"
 
-    constructor(x, y, dx = 15, dy = -15, canvas, imageObj) {
+    constructor(x, y, dx = 30, dy = -30, canvas, imageObj) {
         this.x = x;
         this.y = y;
         this.dx = dx;
