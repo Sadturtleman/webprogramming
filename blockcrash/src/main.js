@@ -130,10 +130,10 @@ class CollisionManager {
     this.collidables.push(obj);
   }
 
-    handle(ball) {
-        const hit = this.collidables.find(obj => obj.checkCollision(ball))
-        if (hit) hit.onCollision(ball)
-    }
+  handle(ball) {
+    const hit = this.collidables.find((obj) => obj.checkCollision(ball));
+    if (hit) hit.onCollision(ball);
+  }
 
   reset() {
     this.collidables = [];
@@ -187,7 +187,13 @@ class Item {
       ctx.drawImage(this.image, this.x, this.y, Item.SIZE, Item.SIZE);
     } else {
       ctx.beginPath();
-      ctx.arc(this.x + Item.SIZE / 2, this.y + Item.SIZE / 2, Item.SIZE / 2, 0, Math.PI * 2);
+      ctx.arc(
+        this.x + Item.SIZE / 2,
+        this.y + Item.SIZE / 2,
+        Item.SIZE / 2,
+        0,
+        Math.PI * 2
+      );
       ctx.fillStyle = this.getColor();
       ctx.fill();
       ctx.closePath();
@@ -214,7 +220,7 @@ class Item {
       heart: "red",
       heartdebuff: "black",
       speedbuff: "blue",
-      speeddebuff: "green"
+      speeddebuff: "green",
     };
     return colors[this.type] || "gray";
   }
@@ -298,10 +304,10 @@ const levelManager = new LevelManager();
 
 class Lives {
   constructor(max = 5) {
-    this.max = max
-    this.life = max
-    this.container = document.getElementById("heartContainer")
-    this.render()
+    this.max = max;
+    this.life = max;
+    this.container = document.getElementById("heartContainer");
+    this.render();
   }
 
   lose() {
@@ -420,28 +426,33 @@ class Paddle extends ICollidable {
     });
   }
 
-    setPosition(direction, mouseX, mouseY) {
-      this.direction = direction;
+  setPosition(direction, mouseX, mouseY) {
+    this.direction = direction;
 
-      const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle;
+    const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle;
 
-      if (direction === Direction.TOP || direction === Direction.BOTTOM) {
-        this.width = DEFAULT_WIDTH * this.scale;
-        this.height = DEFAULT_HEIGHT;
-        this.y = direction === Direction.TOP ? MARGIN : this.canvas.height - DEFAULT_HEIGHT - MARGIN;
-        this.x = mouseX - this.width / 2;
-      } else {
-        this.width = DEFAULT_HEIGHT;
-        this.height = DEFAULT_WIDTH * this.scale;
-        this.x = direction === Direction.LEFT ? MARGIN : this.canvas.width - DEFAULT_HEIGHT - MARGIN;
-        this.y = mouseY - this.height / 2;
-      }
-
-      if (!Paddle.IMAGES[direction]) {
-        Paddle.loadImageForDirection(direction);
-      }
+    if (direction === Direction.TOP || direction === Direction.BOTTOM) {
+      this.width = DEFAULT_WIDTH * this.scale;
+      this.height = DEFAULT_HEIGHT;
+      this.y =
+        direction === Direction.TOP
+          ? MARGIN
+          : this.canvas.height - DEFAULT_HEIGHT - MARGIN;
+      this.x = mouseX - this.width / 2;
+    } else {
+      this.width = DEFAULT_HEIGHT;
+      this.height = DEFAULT_WIDTH * this.scale;
+      this.x =
+        direction === Direction.LEFT
+          ? MARGIN
+          : this.canvas.width - DEFAULT_HEIGHT - MARGIN;
+      this.y = mouseY - this.height / 2;
     }
 
+    if (!Paddle.IMAGES[direction]) {
+      Paddle.loadImageForDirection(direction);
+    }
+  }
 
   clamp() {
     this.x = Math.max(0, Math.min(this.x, this.canvas.width - this.width));
@@ -452,17 +463,37 @@ class Paddle extends ICollidable {
     const r = ball.constructor.RADIUS;
     const { x, y, width, height } = this;
 
-        switch (this.direction) {
-            case Direction.TOP:
-                return ball.y - r <= y + height && ball.y >= y && ball.x >= x && ball.x <= x + width
-            case Direction.BOTTOM:
-                return ball.y + r >= y && ball.y <= y + height && ball.x >= x && ball.x <= x + width
-            case Direction.LEFT:
-                return ball.x - r <= x + width && ball.x >= x && ball.y >= y && ball.y <= y + height
-            case Direction.RIGHT:
-                return ball.x + r >= x && ball.x <= x + width && ball.y >= y && ball.y <= y + height
-        }
+    switch (this.direction) {
+      case Direction.TOP:
+        return (
+          ball.y - r <= y + height &&
+          ball.y >= y &&
+          ball.x >= x &&
+          ball.x <= x + width
+        );
+      case Direction.BOTTOM:
+        return (
+          ball.y + r >= y &&
+          ball.y <= y + height &&
+          ball.x >= x &&
+          ball.x <= x + width
+        );
+      case Direction.LEFT:
+        return (
+          ball.x - r <= x + width &&
+          ball.x >= x &&
+          ball.y >= y &&
+          ball.y <= y + height
+        );
+      case Direction.RIGHT:
+        return (
+          ball.x + r >= x &&
+          ball.x <= x + width &&
+          ball.y >= y &&
+          ball.y <= y + height
+        );
     }
+  }
 
   onCollision(ball) {
     if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
@@ -481,13 +512,13 @@ class Paddle extends ICollidable {
     } else {
       ball.bounceX();
 
-            if (this.direction == Direction.LEFT) {
-                ball.x = this.x + this.width + ball.constructor.RADIUS
-            } else {
-                ball.x = this.x - ball.constructor.RADIUS
-            }
-        }
+      if (this.direction == Direction.LEFT) {
+        ball.x = this.x + this.width + ball.constructor.RADIUS;
+      } else {
+        ball.x = this.x - ball.constructor.RADIUS;
+      }
     }
+  }
 
   expand() {
     this.scale *= 1.5;
@@ -522,7 +553,7 @@ class Score {
   constructor() {
     this.score = 0;
     this.pointPerBrick = 10;
-    this.container = document.getElementById("timeText");
+    this.container = document.getElementById("score");
     this.render();
   }
 
@@ -545,7 +576,7 @@ class Score {
 
   render() {
     if (!this.container) return;
-    this.container.innerText = `점수 : ${this.score}`;
+    this.container.innerText = this.score;
   }
 }
 
@@ -895,9 +926,22 @@ function draw() {
       brick.counted = true;
       sound.playCrash();
       if (Math.random() < 0.3 && level != "EASY") {
-        const types = ["heart", "heartdebuff", "speedbuff", "speeddebuff", "paddlebuff", "paddledebuff"];
+        const types = [
+          "heart",
+          "heartdebuff",
+          "speedbuff",
+          "speeddebuff",
+          "paddlebuff",
+          "paddledebuff",
+        ];
         const type = types[Math.floor(Math.random() * types.length)];
-        items.push(new Item(brick.x + brick.width / 2 - 30, brick.y + brick.height / 2 - 30, type));
+        items.push(
+          new Item(
+            brick.x + brick.width / 2 - 30,
+            brick.y + brick.height / 2 - 30,
+            type
+          )
+        );
       }
     }
   });
