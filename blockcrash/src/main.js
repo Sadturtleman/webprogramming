@@ -380,19 +380,19 @@ class Paddle extends ICollidable {
   }
 
   constructor(canvas) {
-      super()
-      if (Paddle.#instance) throw new Error("Paddle is Singleton")
+    super();
+    if (Paddle.#instance) throw new Error("Paddle is Singleton");
 
-      this.canvas = canvas
-      this.x = 0
-      this.y = 0
-      this.scale = 1;
-      this.width = Paddle.DEFAULT_WIDTH
-      this.height = Paddle.DEFAULT_HEIGHT
-      this.direction = Direction.BOTTOM
+    this.canvas = canvas;
+    this.x = 0;
+    this.y = 0;
+    this.scale = 1;
+    this.width = Paddle.DEFAULT_WIDTH;
+    this.height = Paddle.DEFAULT_HEIGHT;
+    this.direction = Direction.BOTTOM;
 
-      this.bindMouseMove()
-      Paddle.#instance = this
+    this.bindMouseMove();
+    Paddle.#instance = this;
   }
   static getInstance(canvas) {
     return Paddle.#instance || new Paddle(canvas);
@@ -522,30 +522,42 @@ class Paddle extends ICollidable {
 
   expand() {
     this.scale *= 1.5;
-    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    this.setPosition(
+      this.direction,
+      this.x + this.width / 2,
+      this.y + this.height / 2
+    );
   }
 
   shrink() {
     this.scale *= 0.67;
-    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    this.setPosition(
+      this.direction,
+      this.x + this.width / 2,
+      this.y + this.height / 2
+    );
   }
 
   resetSize() {
     this.scale = 1;
-    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    this.setPosition(
+      this.direction,
+      this.x + this.width / 2,
+      this.y + this.height / 2
+    );
   }
 
   draw(ctx) {
-      const image = Paddle.IMAGES[this.direction]
-      if (image && image.complete) {
-          ctx.drawImage(image, this.x, this.y, this.width, this.height)
-      } else {
-          ctx.beginPath()
-          ctx.rect(this.x, this.y, this.width, this.height)
-          ctx.fillStyle = Paddle.COLOR
-          ctx.fill()
-          ctx.closePath()
-      }
+    const image = Paddle.IMAGES[this.direction];
+    if (image && image.complete) {
+      ctx.drawImage(image, this.x, this.y, this.width, this.height);
+    } else {
+      ctx.beginPath();
+      ctx.rect(this.x, this.y, this.width, this.height);
+      ctx.fillStyle = Paddle.COLOR;
+      ctx.fill();
+      ctx.closePath();
+    }
   }
 }
 
@@ -797,6 +809,15 @@ let showVictoryImg = false;
 
 collisionManager.add(paddle);
 
+const storyText = [
+  '"이 몸, 문어보스! 드디어 돌아왔다…!"',
+  '"매번 물풍선에 터지고, 또 터지고… 웃음거리였던 그날들!"',
+  '"하지만 이제는 다르다. 이젠 내가 공을 던질 차례지."',
+  '"너희가 쌓아올린 벽을… 하나씩, 조용히… 무너뜨려주마!"',
+  '"이 복수의 물줄기, 견딜 수 있을까? 후후후…"',
+];
+let textIdx = 0;
+
 // ===================== 이미지 로딩 및 초기 시작 ===================== //
 function loadImage(img) {
   return new Promise((resolve, reject) => {
@@ -1026,7 +1047,30 @@ function addItemToInventory(type) {
 }
 
 // ===================== 이벤트 바인딩 ===================== //
-showScreen("#startScreen");
+showScreen("#startStory");
+$("#startStory .storyTextContainer").click(function () {
+  if (textIdx < storyText.length) {
+    $(".storyText").text(storyText[textIdx++]);
+  } else {
+    showScreen("#startScreen");
+  }
+});
+$(document).keydown(function (e) {
+  if ($("#startStory").is(":visible") && e.code === "Space") {
+    if (textIdx < storyText.length) {
+      $(".storyText").text(storyText[textIdx++]);
+    } else {
+      showScreen("#startScreen");
+    }
+  } else if ($("#startStory").is(":visible") && e.code === "Enter") {
+    showScreen("#startScreen");
+  }
+});
+$("#startStory").keydown(function (e) {
+  if (e.code === "Space") {
+    showScreen("#startScreen");
+  }
+});
 
 $("#levelTitle img").click(() => $("#settingOverlay").css("display", "flex"));
 $("#settingTitle img").click(() => $("#settingOverlay").css("display", "none"));
