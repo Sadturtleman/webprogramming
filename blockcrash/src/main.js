@@ -21,11 +21,11 @@ class Ball {
   static RADIUS = 40;
   static COLOR = "#DD3333";
 
-  constructor(x, y, dx = 50, dy = -50, canvas, imageObj) {
+  constructor(x, y, canvas, imageObj) {
     this.x = x;
     this.y = y;
-    this.dx = dx;
-    this.dy = dy;
+    this.dx = 4;
+    this.dy = -4;
     this.canvas = canvas;
     this.die = false;
     this.collisionManager = null;
@@ -798,8 +798,6 @@ function startLevel(selectedLevel) {
   ball = new Ball(
     canvas.width / 2,
     canvas.height / 2 + 150,
-    2,
-    -2,
     canvas,
     selectedBallImage
   );
@@ -873,8 +871,6 @@ function draw() {
         ball = new Ball(
           canvas.width / 2,
           canvas.height / 2 + 150,
-          2,
-          -2,
           canvas,
           selectedBallImage
         );
@@ -1085,8 +1081,6 @@ $("#levelselect").click(() => {
   ball = new Ball(
     canvas.width / 2,
     canvas.height / 2 + 150,
-    2,
-    -2,
     canvas,
     selectedBallImage
   );
