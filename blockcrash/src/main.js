@@ -724,8 +724,8 @@ class BrickFactory {
         image = brickImages.NORMAL;
         break;
       case "HARD":
-        rows = 1;
-        cols = 1;
+        rows = 5;
+        cols = 8;
         hitCount = 1;
         image = brickImages.HARD;
         break;
@@ -1061,7 +1061,7 @@ function addItemToInventory(type) {
 showScreen("#startStory");
 sound.playBGM("end");
 $("#startStory .storyTextContainer").click(function () {
-  if(textIdx == 0) {
+  if (textIdx == 0) {
     sound.playBGM("story");
   }
   if (textIdx < storyText.length) {
@@ -1075,6 +1075,9 @@ $("#startStory .storyTextContainer").click(function () {
 });
 $(document).keydown(function (e) {
   if ($("#startStory").is(":visible") && e.code === "Space") {
+    if (textIdx == 0) {
+      sound.playBGM("story");
+    }
     if (textIdx < storyText.length) {
       sound.playClicked();
       $(".storyText").text(storyText[textIdx++]);
