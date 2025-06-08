@@ -609,6 +609,7 @@ class SoundManager {
       clicked: new Audio("assets/button_click.mp3"),
       crash: new Audio("assets/crashblock.mp3"),
       item: new Audio("assets/get_item.mp3"),
+      end: new Audio("assets/story_bgm.mp3")
     };
 
     for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
@@ -730,7 +731,6 @@ class BrickFactory {
     const indestructiblepos = [
       [0, 2],
       [0, 7],
-      [1, 4],
       [3, 1],
       [3, 5],
     ];
@@ -828,6 +828,7 @@ function loadImage(img) {
 
 function startLevel(selectedLevel) {
   if (selectedLevel === "LOBBY") {
+    sound.playBGM("end")
     showScreen("#finalStory")
     return;
   }
@@ -1049,6 +1050,7 @@ function addItemToInventory(type) {
 
 // ===================== 이벤트 바인딩 ===================== //
 showScreen("#startStory");
+sound.playBGM("end")
 $("#startStory .storyTextContainer").click(function () {
   if (textIdx < storyText.length) {
     $(".storyText").text(storyText[textIdx++]);
