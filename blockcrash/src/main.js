@@ -724,8 +724,8 @@ class BrickFactory {
         image = brickImages.NORMAL;
         break;
       case "HARD":
-        rows = 5;
-        cols = 8;
+        rows = 1;
+        cols = 1;
         hitCount = 1;
         image = brickImages.HARD;
         break;
@@ -890,7 +890,7 @@ Promise.all([
   loadImage(ballImages.ball3),
 ]).then(() => {
   selectedBallImage = ballImages.ball1;
-  sound.playBGM("story");
+  //sound.playBGM("story");
   draw();
 });
 
@@ -1061,6 +1061,9 @@ function addItemToInventory(type) {
 showScreen("#startStory");
 sound.playBGM("end");
 $("#startStory .storyTextContainer").click(function () {
+  if(textIdx == 0) {
+    sound.playBGM("story");
+  }
   if (textIdx < storyText.length) {
     sound.playClicked();
     $(".storyText").text(storyText[textIdx++]);
