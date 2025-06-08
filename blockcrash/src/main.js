@@ -200,8 +200,8 @@ class Item {
     }
   }
 
-  // ✅ 공과의 충돌 체크
   checkCollisionWithBall(ball) {
+    if (!ball) return false;
     const r = ball.constructor.RADIUS;
     const centerX = this.x + Item.SIZE / 2;
     const centerY = this.y + Item.SIZE / 2;
@@ -984,6 +984,7 @@ function resetToStart(redirectToLobby = true) {
   ball = null;
   items.length = 0;
   gameStarted = false;
+  paddle.resetSize();
 
   collisionManager.reset();
   collisionManager.add(paddle);
