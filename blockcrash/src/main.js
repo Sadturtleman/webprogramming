@@ -609,10 +609,19 @@ class SoundManager {
       clicked: new Audio("assets/button_click.mp3"),
       crash: new Audio("assets/crashblock.mp3"),
       item: new Audio("assets/get_item.mp3"),
-      end: new Audio("assets/story_bgm.mp3")
+      story: new Audio("assets/story_bgm.mp3"),
+      endding: new Audio("assets/endding_bgm.mp3"),
     };
 
-    for (const key of ["start", "lobby", "game1", "game2", "game3"]) {
+    for (const key of [
+      "start",
+      "lobby",
+      "game1",
+      "game2",
+      "game3",
+      "story",
+      "endding",
+    ]) {
       this.tracks[key].loop = true;
     }
   }
@@ -828,8 +837,8 @@ function loadImage(img) {
 
 function startLevel(selectedLevel) {
   if (selectedLevel === "LOBBY") {
-    sound.playBGM("end")
-    showScreen("#finalStory")
+    sound.playBGM("endding");
+    showScreen("#finalStory");
     return;
   }
   level = selectedLevel;
@@ -881,7 +890,7 @@ Promise.all([
   loadImage(ballImages.ball3),
 ]).then(() => {
   selectedBallImage = ballImages.ball1;
-  sound.playBGM("start");
+  sound.playBGM("story");
   draw();
 });
 
@@ -1011,7 +1020,7 @@ function resetToStart(redirectToLobby = true) {
   collisionManager.reset();
   collisionManager.add(paddle);
 
-  $("#finalStory").hide()
+  $("#finalStory").hide();
   $(".item img").remove();
 
   if (redirectToLobby) {
@@ -1050,28 +1059,31 @@ function addItemToInventory(type) {
 
 // ===================== 이벤트 바인딩 ===================== //
 showScreen("#startStory");
-sound.playBGM("end")
+sound.playBGM("end");
 $("#startStory .storyTextContainer").click(function () {
   if (textIdx < storyText.length) {
+    sound.playClicked();
     $(".storyText").text(storyText[textIdx++]);
   } else {
+    sound.playClicked();
     showScreen("#startScreen");
+    sound.playBGM("start");
   }
 });
 $(document).keydown(function (e) {
   if ($("#startStory").is(":visible") && e.code === "Space") {
     if (textIdx < storyText.length) {
+      sound.playClicked();
       $(".storyText").text(storyText[textIdx++]);
     } else {
+      sound.playClicked();
       showScreen("#startScreen");
+      sound.playBGM("start");
     }
   } else if ($("#startStory").is(":visible") && e.code === "Enter") {
+    sound.playClicked();
     showScreen("#startScreen");
-  }
-});
-$("#startStory").keydown(function (e) {
-  if (e.code === "Space") {
-    showScreen("#startScreen");
+    sound.playBGM("start");
   }
 });
 
