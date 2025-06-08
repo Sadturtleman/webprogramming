@@ -210,11 +210,11 @@ img {
   font-weight: 400;
 }
 
-#background1{
+#background1 {
   display: inline;
 }
 
-#background2{
+#background2 {
   display: none;
 }
 
@@ -267,7 +267,6 @@ img {
   display: block;
 }
 
-
 #lifeContainer {
   position: absolute;
   top: 20px;
@@ -281,7 +280,7 @@ img {
 .life {
   width: 60px;
   height: 60px;
-  margin-right : 4px;
+  margin-right: 4px;
 }
 
 /* 게임시작 시 캔버스 숨김 */
@@ -338,7 +337,7 @@ img {
   overflow: hidden;
 }
 
-.item img{
+.item img {
   position: absolute;
   top: 0;
   left: 0;
@@ -365,6 +364,7 @@ aside {
 #heartContainer {
   display: flex;
   justify-content: space-around;
+  align-items: center;
   width: 340px;
   height: 79px;
   border-radius: 5px;
@@ -382,17 +382,18 @@ aside {
   border-radius: 15px;
   background: #299fee;
 }
-#timeContainer {
+#scoreContainer {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  gap: 30px;
   width: 276px;
   height: 71px;
   border-radius: 15px;
   border: 2px solid #0981d3;
   background: #003e8c;
 }
-#timeText {
+#scoreText {
   color: #86fffd;
   -webkit-text-stroke-width: 2px;
   -webkit-text-stroke-color: #022858;
@@ -400,7 +401,7 @@ aside {
   font-size: 40px;
   font-weight: 600;
 }
-#time {
+#score {
   color: #ff8604;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #000;
@@ -488,4 +489,8 @@ aside {
   font-size: 50px;
   font-weight: 500;
   letter-spacing: 4px;
+}
+#desc img {
+  width: 100vw;
+  height: 100vh;
 }
