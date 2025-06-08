@@ -176,7 +176,7 @@ class Item {
     this.image.src = `assets/${type}.png`;
 
     this.image.onerror = () => {
-      console.warn(`⚠️ 아이템 이미지 로드 실패: ${this.type}`);
+      console.warn(`아이템 이미지 로드 실패: ${this.type}`);
     };
   }
 
@@ -357,7 +357,7 @@ class Paddle extends ICollidable {
 
   static IMAGES = {};
 
-  // ✅ 모든 방향 이미지 미리 로딩
+  // 모든 방향 이미지 미리 로딩
   static loadMainImage() {
     for (const direction of Object.values(Direction)) {
       if (!Paddle.IMAGES[direction]) {
@@ -473,7 +473,7 @@ class Paddle extends ICollidable {
 
       ball.bounceWithAngle(offsetRatio, verticalDir);
 
-      // 🎯 위치 보정
+      // 위치 보정
       if (this.direction == Direction.TOP) {
         ball.y = this.y + this.height + ball.constructor.RADIUS;
       } else {
@@ -822,7 +822,7 @@ function getNextLevel(current) {
   if (current === "EASY") return "NORMAL";
   if (current === "NORMAL") return "HARD";
   if (current === "HARD") return "LOBBY";
-  return "EASY"; // HARD 이후엔 EASY로 루프 or 변경 가능
+  return "EASY"; // HARD 이후엔 로비로로
 }
 
 Promise.all([
