@@ -24,8 +24,8 @@ class Ball {
   constructor(x, y, canvas, imageObj) {
     this.x = x;
     this.y = y;
-    this.dx = 2.5;
-    this.dy = -2.5;
+    this.dx = 3;
+    this.dy = -3;
     this.canvas = canvas;
     this.die = false;
     this.collisionManager = null;
