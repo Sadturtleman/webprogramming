@@ -714,8 +714,8 @@ class BrickFactory {
         image = brickImages.NORMAL;
         break;
       case "HARD":
-        rows = 1;
-        cols = 1;
+        rows = 5;
+        cols = 8;
         hitCount = 1;
         image = brickImages.HARD;
         break;
