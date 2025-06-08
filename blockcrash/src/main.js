@@ -21,7 +21,7 @@ class Ball {
   static RADIUS = 40;
   static COLOR = "#DD3333";
 
-  constructor(x, y, dx = 30, dy = -30, canvas, imageObj) {
+  constructor(x, y, dx = 50, dy = -50, canvas, imageObj) {
     this.x = x;
     this.y = y;
     this.dx = dx;
@@ -373,22 +373,21 @@ class Paddle extends ICollidable {
     Paddle.IMAGES[direction] = img;
   }
 
-    constructor(canvas) {
-        super()
-        if (Paddle.#instance) throw new Error("Paddle is Singleton")
+  constructor(canvas) {
+      super()
+      if (Paddle.#instance) throw new Error("Paddle is Singleton")
 
-        this.canvas = canvas
-        this.x = 0
-        this.y = 0
-        this.scale = 1;
-        this.width = Paddle.DEFAULT_WIDTH
-        this.height = Paddle.DEFAULT_HEIGHT
-        this.direction = Direction.BOTTOM
+      this.canvas = canvas
+      this.x = 0
+      this.y = 0
+      this.scale = 1;
+      this.width = Paddle.DEFAULT_WIDTH
+      this.height = Paddle.DEFAULT_HEIGHT
+      this.direction = Direction.BOTTOM
 
-        this.bindMouseMove()
-        Paddle.#instance = this
-    }
-
+      this.bindMouseMove()
+      Paddle.#instance = this
+  }
   static getInstance(canvas) {
     return Paddle.#instance || new Paddle(canvas);
   }
@@ -490,33 +489,33 @@ class Paddle extends ICollidable {
         }
     }
 
-    expand() {
-      this.scale *= 1.5;
-      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
-    }
+  expand() {
+    this.scale *= 1.5;
+    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+  }
 
-    shrink() {
-      this.scale *= 0.67;
-      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
-    }
+  shrink() {
+    this.scale *= 0.67;
+    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+  }
 
-    resetSize() {
-      this.scale = 1;
-      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
-    }
+  resetSize() {
+    this.scale = 1;
+    this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+  }
 
-    draw(ctx) {
-        const image = Paddle.IMAGES[this.direction]
-        if (image && image.complete) {
-            ctx.drawImage(image, this.x, this.y, this.width, this.height)
-        } else {
-            ctx.beginPath()
-            ctx.rect(this.x, this.y, this.width, this.height)
-            ctx.fillStyle = Paddle.COLOR
-            ctx.fill()
-            ctx.closePath()
-        }
-    }
+  draw(ctx) {
+      const image = Paddle.IMAGES[this.direction]
+      if (image && image.complete) {
+          ctx.drawImage(image, this.x, this.y, this.width, this.height)
+      } else {
+          ctx.beginPath()
+          ctx.rect(this.x, this.y, this.width, this.height)
+          ctx.fillStyle = Paddle.COLOR
+          ctx.fill()
+          ctx.closePath()
+      }
+  }
 }
 
 class Score {
@@ -917,8 +916,8 @@ function draw() {
         sound.playgetItem();
         if (item.type === "heart") lives.gain();
         else if (item.type === "heartdebuff") lives.lose();
-        else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2);
-        else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8);
+        else if (item.type === "speedbuff") ball?.adjustSpeed?.(0.8);
+        else if (item.type === "speeddebuff") ball?.adjustSpeed?.(1.2);
         else if (item.type === "paddlebuff") paddle.expand();
         else if (item.type === "paddledebuff") paddle.shrink();
       }
