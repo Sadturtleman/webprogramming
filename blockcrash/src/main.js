@@ -24,8 +24,8 @@ class Ball {
   constructor(x, y, canvas, imageObj) {
     this.x = x;
     this.y = y;
-    this.dx = 4.5;
-    this.dy = -4.5;
+    this.dx = 3;
+    this.dy = -3;
     this.canvas = canvas;
     this.die = false;
     this.collisionManager = null;
@@ -956,7 +956,7 @@ function draw() {
       score.addPoint();
       brick.counted = true;
       sound.playCrash();
-      if (Math.random() < 0.3 && level != "EASY") {
+      if (Math.random() < 0.15 && level != "EASY") {
         const types = [
           "heart",
           "heartdebuff",
