@@ -536,3 +536,9 @@ aside {
   width: 100vw;
   height: 100vh;
 }
+
+#finalStory img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 선택 사항: 비율 유지하며 채우기 */
+}
