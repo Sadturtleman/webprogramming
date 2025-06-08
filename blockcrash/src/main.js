@@ -133,13 +133,6 @@ class CollisionManager {
         const hit = this.collidables.find(obj => obj.checkCollision(ball))
         if (hit) hit.onCollision(ball)
     }
-    handleItem(item) {
-    for (const obj of this.collidables) {
-        if (obj.checkCollisionWithItem && obj.checkCollisionWithItem(item)) {
-            obj.onCollisionWithItem?.(item)
-        }
-    }
-    }
 
     reset() {
         this.collidables = []
@@ -165,75 +158,59 @@ class DirectionDetector {
 }
 
 class Item {
-  static SIZE = 80
+  static SIZE = 50;
 
   constructor(x, y, type) {
-    this.x = x
-    this.y = y
-    this.type = type     // 예: "life", "score", "expand", "shrink", "speedup", "slowdown"
-    this.collected = false
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.collected = false;
 
-    this.image = new Image()
-    this.image.src = `assets/${type}.png`
+    this.image = new Image();
+    this.image.src = `assets/${type}.png`;
 
-    // 에러 디버깅용
     this.image.onerror = () => {
-      console.warn(`⚠️ 아이템 이미지 로드 실패: ${this.type}`)
+      console.warn(`⚠️ 아이템 이미지 로드 실패: ${this.type}`);
+    };
+  }
+
+  draw(ctx) {
+    if (this.collected) return;
+
+    if (this.image.complete && this.image.naturalWidth !== 0) {
+      ctx.drawImage(this.image, this.x, this.y, Item.SIZE, Item.SIZE);
+    } else {
+      ctx.beginPath();
+      ctx.arc(this.x + Item.SIZE / 2, this.y + Item.SIZE / 2, Item.SIZE / 2, 0, Math.PI * 2);
+      ctx.fillStyle = this.getColor();
+      ctx.fill();
+      ctx.closePath();
     }
+  }
+
+  // ✅ 공과의 충돌 체크
+  checkCollisionWithBall(ball) {
+    const r = ball.constructor.RADIUS;
+    const centerX = this.x + Item.SIZE / 2;
+    const centerY = this.y + Item.SIZE / 2;
+    const dx = ball.x - centerX;
+    const dy = ball.y - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance <= r + Item.SIZE / 2;
+  }
+
+  collect() {
+    this.collected = true;
   }
 
   getColor() {
     const colors = {
-      life: "red",
-      score: "gold",
-      expand: "blue",
-      shrink: "purple",
-      speedup: "orange",
-      slowdown: "green"
-    }
-    return colors[this.type] || "gray"
-  }
-
-  draw(ctx) {
-    if (this.collected) return
-
-    const size = Item.SIZE
-
-    if (this.image.complete && this.image.naturalWidth !== 0) {
-      ctx.drawImage(this.image, this.x, this.y, size, size)
-    } else {
-      // 이미지 로딩 실패 또는 대기 중일 때 기본 원형 표시
-      ctx.beginPath()
-      ctx.arc(this.x + size / 2, this.y + size / 2, size / 2, 0, Math.PI * 2)
-      ctx.fillStyle = this.getColor()
-      ctx.fill()
-      ctx.closePath()
-    }
-  }
-
-  update() {
-    // 아래로 떨어지는 애니메이션
-    this.y += 2
-  }
-
-  checkCollision(paddle) {
-    const px = paddle.x
-    const py = paddle.y
-    const pw = paddle.width
-    const ph = paddle.height
-
-    const size = Item.SIZE
-
-    return (
-      this.x < px + pw &&
-      this.x + size > px &&
-      this.y < py + ph &&
-      this.y + size > py
-    )
-  }
-
-  collect() {
-    this.collected = true
+      heart: "red",
+      heartdebuff: "black",
+      speedbuff: "blue",
+      speeddebuff: "green"
+    };
+    return colors[this.type] || "gray";
   }
 }
 
@@ -315,7 +292,7 @@ class LevelManager {
 const levelManager = new LevelManager()
 
 class Lives {
-  constructor(max = 3) {
+  constructor(max = 5) {
     this.max = max
     this.life = max
     this.container = document.getElementById("heartContainer")
@@ -492,15 +469,6 @@ class Paddle extends ICollidable {
                 return ball.x + r >= x && ball.x <= x + width && ball.y >= y && ball.y <= y + height
         }
     }
-    checkCollisionWithItem(item) {
-        const size = Item.SIZE
-        return (
-            this.x < item.x + size &&
-            this.x + this.width > item.x &&
-            this.y < item.y + size &&
-            this.y + this.height > item.y
-        )
-    }
 
     onCollision(ball) {
         if (this.direction == Direction.TOP || this.direction == Direction.BOTTOM) {
@@ -543,29 +511,6 @@ class Paddle extends ICollidable {
             ctx.closePath()
         }
     }
-
-    enlarge() {
-        this.width *= 1.5
-        this.height *= 1.5
-
-        // 일정 시간 후 원래 크기로 복구
-        setTimeout(() => {
-            this.width = Paddle.DEFAULT_WIDTH
-            this.height = Paddle.DEFAULT_HEIGHT
-        }, 5000)
-    }
-
-    shrink() {
-        this.width *= 0.7
-        this.height *= 0.7
-
-        // 5초 후 원래 크기로 복원
-        setTimeout(() => {
-            this.width = Paddle.DEFAULT_WIDTH
-            this.height = Paddle.DEFAULT_HEIGHT
-        }, 5000)
-    }
-
 }
 
 class Score {
@@ -916,24 +861,23 @@ function draw() {
       brick.counted = true;
       sound.playCrash()
       if (Math.random() < 0.3 && level != "EASY") {
-        const types = ["paddlebuff", "paddledebuff", "speedbuff", "speeddebuff"];
+        const types = ["heart", "heartdebuff", "speedbuff", "speeddebuff"];
         const type = types[Math.floor(Math.random() * types.length)];
-        items.push(new Item(brick.x + brick.width / 2, brick.y + brick.height / 2, type));
+        items.push(new Item(brick.x + brick.width / 2 - 30, brick.y + brick.height / 2 - 30, type));
       }
     }
   });
 
   items.forEach(item => {
     if (!item.collected) {
-      item.update();
       item.draw(ctx);
 
-      if (paddle.checkCollisionWithItem(item)) {
+      if (item.checkCollisionWithBall(ball)) {
         item.collect();
         addItemToInventory(item.type);
         sound.playgetItem();
-        if (item.type === "paddlebuff") paddle.enlarge();
-        else if (item.type === "paddledebuff") paddle.shrink();
+        if (item.type === "heart") lives.gain();
+        else if (item.type === "heartdebuff") lives.lose();
         else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2);
         else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8);
       }
