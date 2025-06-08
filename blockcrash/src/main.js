@@ -376,6 +376,7 @@ class Paddle extends ICollidable {
         this.canvas = canvas
         this.x = 0
         this.y = 0
+        this.scale = 1;
         this.width = Paddle.DEFAULT_WIDTH
         this.height = Paddle.DEFAULT_HEIGHT
         this.direction = Direction.BOTTOM
@@ -417,37 +418,27 @@ class Paddle extends ICollidable {
     }
 
     setPosition(direction, mouseX, mouseY) {
-        this.direction = direction
+      this.direction = direction;
 
-        const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle
+      const { DEFAULT_WIDTH, DEFAULT_HEIGHT, MARGIN } = Paddle;
 
-        if (direction === Direction.TOP) {
-            this.width = DEFAULT_WIDTH
-            this.height = DEFAULT_HEIGHT
-            this.y = MARGIN
-            this.x = mouseX - this.width / 2
-        } else if (direction === Direction.BOTTOM) {
-            this.width = DEFAULT_WIDTH
-            this.height = DEFAULT_HEIGHT
-            this.y = this.canvas.height - this.height - MARGIN
-            this.x = mouseX - this.width / 2
-        } else if (direction === Direction.LEFT) {
-            this.width = DEFAULT_HEIGHT
-            this.height = DEFAULT_WIDTH
-            this.x = MARGIN
-            this.y = mouseY - this.height / 2
-        } else if (direction === Direction.RIGHT) {
-            this.width = DEFAULT_HEIGHT
-            this.height = DEFAULT_WIDTH
-            this.x = this.canvas.width - this.width - MARGIN
-            this.y = mouseY - this.height / 2
-        }
+      if (direction === Direction.TOP || direction === Direction.BOTTOM) {
+        this.width = DEFAULT_WIDTH * this.scale;
+        this.height = DEFAULT_HEIGHT;
+        this.y = direction === Direction.TOP ? MARGIN : this.canvas.height - DEFAULT_HEIGHT - MARGIN;
+        this.x = mouseX - this.width / 2;
+      } else {
+        this.width = DEFAULT_HEIGHT;
+        this.height = DEFAULT_WIDTH * this.scale;
+        this.x = direction === Direction.LEFT ? MARGIN : this.canvas.width - DEFAULT_HEIGHT - MARGIN;
+        this.y = mouseY - this.height / 2;
+      }
 
-        // 보장용: 해당 방향 이미지가 없으면 로드
-        if (!Paddle.IMAGES[direction]) {
-            Paddle.loadImageForDirection(direction)
-        }
+      if (!Paddle.IMAGES[direction]) {
+        Paddle.loadImageForDirection(direction);
+      }
     }
+
 
     clamp() {
         this.x = Math.max(0, Math.min(this.x, this.canvas.width - this.width))
@@ -488,7 +479,6 @@ class Paddle extends ICollidable {
         } else {
             ball.bounceX()
 
-            // 🎯 위치 보정 (좌우 패들일 경우)
             if (this.direction == Direction.LEFT) {
                 ball.x = this.x + this.width + ball.constructor.RADIUS
             } else {
@@ -497,7 +487,20 @@ class Paddle extends ICollidable {
         }
     }
 
+    expand() {
+      this.scale *= 1.5;
+      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    }
 
+    shrink() {
+      this.scale *= 0.67;
+      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    }
+
+    resetSize() {
+      this.scale = 1;
+      this.setPosition(this.direction, this.x + this.width / 2, this.y + this.height / 2);
+    }
 
     draw(ctx) {
         const image = Paddle.IMAGES[this.direction]
@@ -861,7 +864,7 @@ function draw() {
       brick.counted = true;
       sound.playCrash()
       if (Math.random() < 0.3 && level != "EASY") {
-        const types = ["heart", "heartdebuff", "speedbuff", "speeddebuff"];
+        const types = ["heart", "heartdebuff", "speedbuff", "speeddebuff", "paddlebuff", "paddledebuff"];
         const type = types[Math.floor(Math.random() * types.length)];
         items.push(new Item(brick.x + brick.width / 2 - 30, brick.y + brick.height / 2 - 30, type));
       }
@@ -880,6 +883,8 @@ function draw() {
         else if (item.type === "heartdebuff") lives.lose();
         else if (item.type === "speedbuff") ball?.adjustSpeed?.(1.2);
         else if (item.type === "speeddebuff") ball?.adjustSpeed?.(0.8);
+        else if (item.type === "paddlebuff") paddle.expand();
+        else if (item.type === "paddledebuff") paddle.shrink();
       }
     }
   });
