@@ -53,6 +53,15 @@ img {
   font-size: 40px;
   font-weight: 400;
 }
+.fianlstoryText {
+  display: block;
+  padding-top: 39px;
+  padding-left: 39px;
+  color: #000;
+  font-family: "Black Han Sans";
+  font-size: 40px;
+  font-weight: 400;
+}
 .skip {
   position: absolute;
   top: 250px;
