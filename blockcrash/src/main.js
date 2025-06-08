@@ -828,7 +828,7 @@ function loadImage(img) {
 
 function startLevel(selectedLevel) {
   if (selectedLevel === "LOBBY") {
-    resetToStart(true);
+    showScreen("#finalStory")
     return;
   }
   level = selectedLevel;
@@ -1010,6 +1010,7 @@ function resetToStart(redirectToLobby = true) {
   collisionManager.reset();
   collisionManager.add(paddle);
 
+  $("#finalStory").hide()
   $(".item img").remove();
 
   if (redirectToLobby) {
@@ -1208,4 +1209,11 @@ $(".audioCheck").click(function () {
   }
 
   sound.playClicked();
+});
+
+$(document).on("keydown.finalStory", (e) => {
+  if ($("#finalStory").is(":visible") && e.code === "Enter") {
+    $(document).off("keydown.finalStory");
+    resetToStart(true);
+  }
 });
