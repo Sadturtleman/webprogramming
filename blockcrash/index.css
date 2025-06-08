@@ -20,7 +20,8 @@ img {
   align-items: center;
   background-color: #3171d7;
 }
-#startStory {
+#startStory,
+#finalStory {
   display: flex;
   position: relative;
   justify-content: center;
