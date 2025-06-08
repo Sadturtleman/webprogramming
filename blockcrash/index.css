@@ -364,6 +364,7 @@ aside {
 #heartContainer {
   display: flex;
   justify-content: space-around;
+  align-items: center;
   width: 340px;
   height: 79px;
   border-radius: 5px;
