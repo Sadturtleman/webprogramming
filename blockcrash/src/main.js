@@ -995,13 +995,17 @@ function draw() {
     }
   });
 
-  const allDestroyed = bricks.length > 0 && bricks.every((b) => b.destroyed);
-  if (allDestroyed && !showVictoryImg) {
+  const allDestroyed = bricks
+    .filter((b) => !b.indestructible) // 파괴 가능한 벽돌만 필터링
+    .every((b) => b.destroyed);       // 모두 파괴되었는가
+
+  if (bricks.some(b => !b.indestructible) && allDestroyed && !showVictoryImg) {
     showVictoryImg = true;
     sound.playVictory();
     ball = null;
     setTimeout(() => resetToStart(false), 3000);
   }
+
 
   requestAnimationFrame(draw);
 }
