@@ -343,16 +343,17 @@ img {
 }
 #game {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   background: #3171d7;
   box-sizing: border-box;
+  gap: 60px;
 }
 #canvasContainer {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 900px;
+  width: 960px;
   justify-content: center;
   align-items: center;
   position: relative;
